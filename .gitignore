@@ -1,2 +1,12 @@
 .vs
 Api.Domain/obj/
+Api.Domain/bin/
+Api.Infrastructure/bin/
+Api.Infrastructure/obj/
+Api.Services/bin/
+Api.Services/obj/
+Api.Web/bin/
+Api.Web/obj/
+Api.Repository/obj/
+Api.Repository/bin/
+.vscode

@@ -1,7 +1,4 @@
-﻿using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
-
-namespace Api.Domain.Models
+﻿namespace Api.Domain.Models
 {
     public class Product : BaseEntity
     {

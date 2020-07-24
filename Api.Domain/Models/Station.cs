@@ -1,6 +1,7 @@
-﻿using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace Api.Domain.Models
 {
@@ -24,5 +25,11 @@ namespace Api.Domain.Models
         public string State { get; set; }
 
         public string Municipality { get; set; }
+
+        [BsonRepresentation(BsonType.DateTime)]
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        [BsonRepresentation(BsonType.DateTime)]
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     }
 }
