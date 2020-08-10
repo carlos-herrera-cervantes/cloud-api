@@ -24,6 +24,8 @@ namespace Api.Web
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             services.AddTransient<IStationManager, StationManager>();
             services.AddTransient<IStationRepository, StationRepository>();
+            services.AddTransient<IUserManager, UserManager>();
+            services.AddTransient<IUserRepository, UserRepository>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
