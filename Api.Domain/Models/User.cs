@@ -16,11 +16,5 @@ namespace Api.Domain.Models
         public string Password { get; set; }
 
         public string Role { get; set; } = Roles.Employee;
-
-        [BsonRepresentation(BsonType.DateTime)]
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
-        [BsonRepresentation(BsonType.DateTime)]
-        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     }
 }

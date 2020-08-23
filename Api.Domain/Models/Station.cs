@@ -25,11 +25,5 @@ namespace Api.Domain.Models
         public string State { get; set; }
 
         public string Municipality { get; set; }
-
-        [BsonRepresentation(BsonType.DateTime)]
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
-        [BsonRepresentation(BsonType.DateTime)]
-        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     }
 }

@@ -19,13 +19,7 @@ namespace Api.Domain.Models
         [BsonRepresentation(BsonType.ObjectId)]
         public string UserId { get; set; }
 
-        [BsonRepresentation(BsonType.DateTime)]
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
-        [BsonRepresentation(BsonType.DateTime)]
-        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
-
-        public Product[] Products { get; set; }
+        public ProductSold[] Products { get; set; }
 
         public Payment[] Payments { get; set; }
 

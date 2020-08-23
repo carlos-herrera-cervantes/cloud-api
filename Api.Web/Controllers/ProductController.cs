@@ -6,15 +6,16 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Web.Controllers
 {
-    [Route("api/v1/users")]
+    [Route("api/v1/products")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class ProductController : ControllerBase
     {
-        private readonly IUserManager _userManager;
-        private readonly IUserRepository _userRepository;
+        private readonly IProductManager _productManager;
 
-        public UserController(IUserManager userManager, IUserRepository userRepository)
-            => (_userManager, _userRepository) = (userManager, userRepository);
+        private readonly IProductRepository _productRepository;
+
+        public ProductController(IProductManager productManager, IProductRepository productRepository)
+            => (_productManager, _productRepository) = (productManager, productRepository);
 
         /// <summary>
         /// GET
@@ -25,8 +26,8 @@ namespace Api.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllAsync()
         {
-            var users = await _userRepository.GetAllAsync();
-            return Ok(users);
+            var products = await _productRepository.GetAllAsync();
+            return Ok(products);
         }
 
         #endregion
@@ -36,8 +37,8 @@ namespace Api.Web.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetByIdAsync(string id)
         {
-            var user = await _userRepository.GetByIdAsync(id);
-            return Ok(user);
+            var product = await _productRepository.GetByIdAsync(id);
+            return Ok(product);
         }
 
         #endregion
@@ -49,26 +50,26 @@ namespace Api.Web.Controllers
         #region snippet_Create
 
         [HttpPost]
-        public async Task<IActionResult> CreateAsync(User user)
+        public async Task<IActionResult> CreateAsync(Product product)
         {
-            await _userManager.CreateAsync(user);
-            return Created("", user);
+            await _productManager.CreateAsync(product);
+            return Created("", product);
         }
 
         #endregion
 
         /// <summary>
         /// PATCH
-        /// </summay>
+        /// </summary>
 
         #region snippet_UpdatePartial
 
         [HttpPatch("{id}")]
-        public async Task<IActionResult> UpdateByIdAsync(string id, [FromBody] JsonPatchDocument<User> replaceUser)
+        public async Task<IActionResult> UpdateByIdAsync(string id, [FromBody] JsonPatchDocument<Product> replaceProduct)
         {
-            var user = await _userRepository.GetByIdAsync(id);
-            await _userManager.UpdateByIdAsync(id, user, replaceUser);
-            return Created("", user);
+            var product = await _productRepository.GetByIdAsync(id);
+            await _productManager.UpdateByIdAsync(id, product, replaceProduct);
+            return Created("", product);
         }
 
         #endregion
@@ -82,7 +83,7 @@ namespace Api.Web.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteByIdAsync(string id)
         {
-            await _userManager.DeleteByIdAsync(id);
+            await _productManager.DeleteByIdAsync(id);
             return NoContent();
         }
 
