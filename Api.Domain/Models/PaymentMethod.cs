@@ -1,5 +1,3 @@
-using System;
-
 namespace Api.Domain.Models
 {
     public class PaymentMethod : BaseEntity

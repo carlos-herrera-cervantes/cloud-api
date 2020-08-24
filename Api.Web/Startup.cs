@@ -2,6 +2,7 @@ using Api.Infrastructure.Container;
 using Api.Repository.Managers;
 using Api.Repository.Repositories;
 using Api.Services.Services;
+using Api.Web.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -20,6 +21,7 @@ namespace Api.Web
         {
             services.AddControllers().AddNewtonsoftJson();
             services.AddServicesFromInfrastructure(Configuration);
+            services.UseSwagger();
             services.AddScoped(typeof(IManager<>), typeof(Manager<>));
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             services.AddTransient<IStationManager, StationManager>();
@@ -36,6 +38,11 @@ namespace Api.Web
         {
             if (env.IsDevelopment()) { app.UseDeveloperExceptionPage(); }
 
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Gulf Remastered - Local API V1");
+            });
             app.UseRouting();
             app.UseEndpoints(endpoints => endpoints.MapControllers());
         }

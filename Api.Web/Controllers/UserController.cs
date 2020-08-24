@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using Api.Domain.Models;
 using Api.Services.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,6 +24,8 @@ namespace Api.Web.Controllers
         #region snippet_GetAll
 
         [HttpGet]
+        [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAllAsync()
         {
             var users = await _userRepository.GetAllAsync();
@@ -34,6 +37,9 @@ namespace Api.Web.Controllers
         #region snippet_GetById
 
         [HttpGet("{id}")]
+        [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetByIdAsync(string id)
         {
             var user = await _userRepository.GetByIdAsync(id);
@@ -49,6 +55,9 @@ namespace Api.Web.Controllers
         #region snippet_Create
 
         [HttpPost]
+        [ProducesResponseType(typeof(User), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CreateAsync(User user)
         {
             await _userManager.CreateAsync(user);
@@ -64,6 +73,10 @@ namespace Api.Web.Controllers
         #region snippet_UpdatePartial
 
         [HttpPatch("{id}")]
+        [ProducesResponseType(typeof(User), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> UpdateByIdAsync(string id, [FromBody] JsonPatchDocument<User> replaceUser)
         {
             var user = await _userRepository.GetByIdAsync(id);
@@ -80,6 +93,9 @@ namespace Api.Web.Controllers
         #region snippet_Delete
 
         [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeleteByIdAsync(string id)
         {
             await _userManager.DeleteByIdAsync(id);

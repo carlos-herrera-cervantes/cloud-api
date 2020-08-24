@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Api.Domain.Models;
 using Api.Services.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,13 +17,11 @@ namespace Api.Web.Controllers
         public StationController(IStationManager stationManager, IStationRepository stationRepository)
             => (_stationManager, _stationRepository) = (stationManager, stationRepository);
 
-        /// <summary>
-        /// GET
-        /// </summary>
-
         #region snippet_GetAll
 
         [HttpGet]
+        [ProducesResponseType(typeof(Station), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAllAsync()
         {
             var stations = await _stationRepository.GetAllAsync();
@@ -34,6 +33,9 @@ namespace Api.Web.Controllers
         #region snippet_GetById
 
         [HttpGet("{id}")]
+        [ProducesResponseType(typeof(Station), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetByIdAsync(string id)
         {
             var station = await _stationRepository.GetByIdAsync(id);
@@ -42,13 +44,12 @@ namespace Api.Web.Controllers
 
         #endregion
 
-        /// <summary
-        /// POST
-        /// </summary>
-
         #region snippet_Create
 
         [HttpPost]
+        [ProducesResponseType(typeof(Station), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CreateAsync(Station station)
         {
             await _stationManager.CreateAsync(station);
@@ -57,13 +58,13 @@ namespace Api.Web.Controllers
 
         #endregion
 
-        /// <summary>
-        /// PATCH
-        /// </summary>
-
         #region snippet_UpdatePartial
 
         [HttpPatch("{id}")]
+        [ProducesResponseType(typeof(Station), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> UpdateByIdAsync(string id, [FromBody] JsonPatchDocument<Station> replaceStation)
         {
             var station = await _stationRepository.GetByIdAsync(id);
@@ -73,13 +74,12 @@ namespace Api.Web.Controllers
 
         #endregion
 
-        /// <summary>
-        /// DELETE
-        /// </summary>
-
         #region snippet_Delete
 
         [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeleteByIdAsync(string id)
         {
             await _stationManager.DeleteByIdAsync(id);

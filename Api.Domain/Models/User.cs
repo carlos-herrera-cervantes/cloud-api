@@ -1,7 +1,4 @@
-using System;
 using Api.Domain.Constants;
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
 
 namespace Api.Domain.Models
 {

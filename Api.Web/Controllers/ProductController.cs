@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using Api.Domain.Models;
 using Api.Services.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,13 +18,11 @@ namespace Api.Web.Controllers
         public ProductController(IProductManager productManager, IProductRepository productRepository)
             => (_productManager, _productRepository) = (productManager, productRepository);
 
-        /// <summary>
-        /// GET
-        /// </summary>
-
         #region snippet_GetAll
 
         [HttpGet]
+        [ProducesResponseType(typeof(Product), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAllAsync()
         {
             var products = await _productRepository.GetAllAsync();
@@ -35,6 +34,9 @@ namespace Api.Web.Controllers
         #region snippet_GetById
 
         [HttpGet("{id}")]
+        [ProducesResponseType(typeof(Product), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetByIdAsync(string id)
         {
             var product = await _productRepository.GetByIdAsync(id);
@@ -43,13 +45,12 @@ namespace Api.Web.Controllers
 
         #endregion
 
-        /// <summary>
-        /// POST
-        /// </summary>
-
         #region snippet_Create
-
+        
         [HttpPost]
+        [ProducesResponseType(typeof(Product), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CreateAsync(Product product)
         {
             await _productManager.CreateAsync(product);
@@ -58,13 +59,13 @@ namespace Api.Web.Controllers
 
         #endregion
 
-        /// <summary>
-        /// PATCH
-        /// </summary>
-
         #region snippet_UpdatePartial
 
         [HttpPatch("{id}")]
+        [ProducesResponseType(typeof(Product), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> UpdateByIdAsync(string id, [FromBody] JsonPatchDocument<Product> replaceProduct)
         {
             var product = await _productRepository.GetByIdAsync(id);
@@ -74,13 +75,12 @@ namespace Api.Web.Controllers
 
         #endregion
 
-        /// <summary>
-        /// DELETE
-        /// </summary>
-
         #region snippet_Delete
 
         [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeleteByIdAsync(string id)
         {
             await _productManager.DeleteByIdAsync(id);
