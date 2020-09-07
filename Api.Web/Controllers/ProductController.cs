@@ -1,13 +1,16 @@
 using System.Threading.Tasks;
 using Api.Domain.Models;
 using Api.Services.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Web.Controllers
 {
+    [Authorize]
     [Route("api/v1/products")]
+    [Produces("application/json")]
     [ApiController]
     public class ProductController : ControllerBase
     {
@@ -26,7 +29,7 @@ namespace Api.Web.Controllers
         public async Task<IActionResult> GetAllAsync()
         {
             var products = await _productRepository.GetAllAsync();
-            return Ok(products);
+            return Ok(new { Status = true, Data = products });
         }
 
         #endregion
@@ -40,7 +43,7 @@ namespace Api.Web.Controllers
         public async Task<IActionResult> GetByIdAsync(string id)
         {
             var product = await _productRepository.GetByIdAsync(id);
-            return Ok(product);
+            return Ok(new { Status = true, Data = product });
         }
 
         #endregion
@@ -54,7 +57,7 @@ namespace Api.Web.Controllers
         public async Task<IActionResult> CreateAsync(Product product)
         {
             await _productManager.CreateAsync(product);
-            return Created("", product);
+            return Created("", new { Status = true, Data = product });
         }
 
         #endregion
@@ -70,7 +73,7 @@ namespace Api.Web.Controllers
         {
             var product = await _productRepository.GetByIdAsync(id);
             await _productManager.UpdateByIdAsync(id, product, replaceProduct);
-            return Created("", product);
+            return Created("", new { Status = true, Data = product });
         }
 
         #endregion

@@ -1,13 +1,16 @@
 using System.Threading.Tasks;
 using Api.Domain.Models;
 using Api.Services.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Web.Controllers
 {
+    [Authorize]
     [Route("api/v1/users")]
+    [Produces("application/json")]
     [ApiController]
     public class UserController : ControllerBase
     {
@@ -17,19 +20,15 @@ namespace Api.Web.Controllers
         public UserController(IUserManager userManager, IUserRepository userRepository)
             => (_userManager, _userRepository) = (userManager, userRepository);
 
-        /// <summary>
-        /// GET
-        /// </summary>
-
         #region snippet_GetAll
 
         [HttpGet]
         [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetAllAsync()
+        public async Task<IActionResult> GetAllAsync([FromQuery] Request request)
         {
             var users = await _userRepository.GetAllAsync();
-            return Ok(users);
+            return Ok(new { Status = true, Data = users });
         }
 
         #endregion
@@ -43,14 +42,10 @@ namespace Api.Web.Controllers
         public async Task<IActionResult> GetByIdAsync(string id)
         {
             var user = await _userRepository.GetByIdAsync(id);
-            return Ok(user);
+            return Ok(new { Status = true, Data = user });
         }
 
         #endregion
-
-        /// <summary>
-        /// POST
-        /// </summary>
 
         #region snippet_Create
 
@@ -61,14 +56,10 @@ namespace Api.Web.Controllers
         public async Task<IActionResult> CreateAsync(User user)
         {
             await _userManager.CreateAsync(user);
-            return Created("", user);
+            return Created("", new { Status = true, Data = user });
         }
 
         #endregion
-
-        /// <summary>
-        /// PATCH
-        /// </summay>
 
         #region snippet_UpdatePartial
 
@@ -81,14 +72,10 @@ namespace Api.Web.Controllers
         {
             var user = await _userRepository.GetByIdAsync(id);
             await _userManager.UpdateByIdAsync(id, user, replaceUser);
-            return Created("", user);
+            return Created("", new { Status = true, Data = user });
         }
 
         #endregion
-
-        /// <summary>
-        /// DELETE
-        /// </summary>
 
         #region snippet_Delete
 

@@ -3,6 +3,7 @@ using MongoDB.Driver;
 using Api.Infrastructure.Contexts;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Api.Repository.Extensions;
 
 namespace Api.Repository.Repositories
 {
@@ -21,6 +22,10 @@ namespace Api.Repository.Repositories
 
         public async Task<T> GetByIdAsync(string id) => await _context.Find(entity => entity.Id == id).FirstOrDefaultAsync();
 
-        public async Task<T> GetOneAsync() => await _context.Find(entity => true).FirstOrDefaultAsync();
+        public async Task<T> GetOneAsync(Request request)
+        {
+            var filter = MongoDBDefinitions.BuildFilter<T>(request);
+            return await _context.Find(filter).FirstOrDefaultAsync();
+        }
     }
 }

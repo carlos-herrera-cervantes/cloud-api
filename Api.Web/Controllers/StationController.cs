@@ -1,13 +1,16 @@
 ﻿using System.Threading.Tasks;
 using Api.Domain.Models;
 using Api.Services.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Web.Controllers
 {
+    [Authorize]
     [Route("api/v1/stations")]
+    [Produces("application/json")]
     [ApiController]
     public class StationController : ControllerBase
     {
@@ -25,7 +28,7 @@ namespace Api.Web.Controllers
         public async Task<IActionResult> GetAllAsync()
         {
             var stations = await _stationRepository.GetAllAsync();
-            return Ok(stations);
+            return Ok(new { Status = true, Data = stations });
         }
 
         #endregion
@@ -39,7 +42,7 @@ namespace Api.Web.Controllers
         public async Task<IActionResult> GetByIdAsync(string id)
         {
             var station = await _stationRepository.GetByIdAsync(id);
-            return Ok(station);
+            return Ok(new { Status = true, Data = station });
         }
 
         #endregion
@@ -53,7 +56,7 @@ namespace Api.Web.Controllers
         public async Task<IActionResult> CreateAsync(Station station)
         {
             await _stationManager.CreateAsync(station);
-            return Created("", station);
+            return Created("", new { Status = true, Data = station });
         }
 
         #endregion
@@ -69,7 +72,7 @@ namespace Api.Web.Controllers
         {
             var station = await _stationRepository.GetByIdAsync(id);
             await _stationManager.UpdateByIdAsync(id, station, replaceStation);
-            return Created("", station);
+            return Created("", new { Status = true, Data = station });
         }
 
         #endregion

@@ -1,12 +1,14 @@
 using System.Threading.Tasks;
 using Api.Domain.Models;
 using Api.Services.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Web.Controllers
 {
+    [Authorize]
     [Route("api/v1/payment-methods")]
     [Produces("application/json")]
     [ApiController]
@@ -27,7 +29,7 @@ namespace Api.Web.Controllers
         public async Task<IActionResult> GetAllAsync()
         {
             var paymentMethods = await _paymentMethodRepository.GetAllAsync();
-            return Ok(paymentMethods);
+            return Ok(new { Status = true, Data = paymentMethods });
         }
 
         #endregion
@@ -41,7 +43,7 @@ namespace Api.Web.Controllers
         public async Task<IActionResult> GetByIdAsync(string id)
         {
             var paymentMethod = await _paymentMethodRepository.GetByIdAsync(id);
-            return Ok(paymentMethod);
+            return Ok(new { Status = true, Data = paymentMethod });
         }
 
         #endregion
@@ -55,7 +57,7 @@ namespace Api.Web.Controllers
         public async Task<IActionResult> CreateAsync(PaymentMethod paymentMethod)
         {
             await _paymentMethodManager.CreateAsync(paymentMethod);
-            return Created("", paymentMethod);
+            return Created("", new { Status = true, Data = paymentMethod });
         }
 
         #endregion
@@ -71,7 +73,7 @@ namespace Api.Web.Controllers
         {
             var paymentMethod = await _paymentMethodRepository.GetByIdAsync(id);
             await _paymentMethodManager.UpdateByIdAsync(id, paymentMethod, replacePaymentMethod);
-            return Created("", paymentMethod);
+            return Created("", new { Status = true, Data = paymentMethod });
         }
 
         #endregion

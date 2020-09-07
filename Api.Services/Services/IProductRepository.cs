@@ -10,6 +10,6 @@ namespace Api.Services.Services
 
         Task<Product> GetByIdAsync(string id);
 
-        Task<Product> GetOneAsync();
+        Task<Product> GetOneAsync(Request request);
     }
 }

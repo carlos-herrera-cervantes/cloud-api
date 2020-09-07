@@ -10,6 +10,6 @@ namespace Api.Services.Services
 
         Task<PaymentMethod> GetByIdAsync(string id);
 
-        Task<PaymentMethod> GetOneAsync();
+        Task<PaymentMethod> GetOneAsync(Request request);
     }
 }

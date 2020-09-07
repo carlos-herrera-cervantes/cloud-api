@@ -10,6 +10,6 @@ namespace Api.Services.Services
 
         Task<Station> GetByIdAsync(string id);
 
-        Task<Station> GetOneAsync();
+        Task<Station> GetOneAsync(Request request);
     }
 }

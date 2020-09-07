@@ -10,6 +10,6 @@ namespace Api.Repository.Repositories
 
         Task<T> GetByIdAsync(string id);
 
-        Task<T> GetOneAsync();
+        Task<T> GetOneAsync(Request request);
     }
 }

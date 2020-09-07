@@ -10,6 +10,6 @@ namespace Api.Services.Services
 
         Task<User> GetByIdAsync(string id);
 
-        Task<User> GetOneAsync();
+        Task<User> GetOneAsync(Request request);
     }
 }
