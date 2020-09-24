@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Api.Domain.Models;
 using Api.Services.Services;
+using Api.Web.Middlewares;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
@@ -39,6 +40,7 @@ namespace Api.Web.Controllers
         [ProducesResponseType(typeof(Station), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [StationExists]
         public async Task<IActionResult> GetByIdAsync(string id)
         {
             var station = await _stationRepository.GetByIdAsync(id);
@@ -68,6 +70,7 @@ namespace Api.Web.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [StationExists]
         public async Task<IActionResult> UpdateByIdAsync(string id, [FromBody] JsonPatchDocument<Station> replaceStation)
         {
             var station = await _stationRepository.GetByIdAsync(id);
@@ -83,6 +86,7 @@ namespace Api.Web.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [StationExists]
         public async Task<IActionResult> DeleteByIdAsync(string id)
         {
             await _stationManager.DeleteByIdAsync(id);

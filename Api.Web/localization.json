@@ -1,0 +1,58 @@
+[
+  {
+    "Key": "InvalidPermissions",
+    "LocalizedValue": {
+      "es": "No tienes suficientes permisos para ejecutar esta acción.",
+      "en": "You don't have sufficient permissions to do this action."
+    }
+  },
+  {
+    "Key": "PurchaseNotFound",
+    "LocalizedValue": {
+      "es": "Venta no encontrada.",
+      "en": "Purchase not found."
+    }
+  },
+  {
+    "Key": "InvalidObjectId",
+    "LocalizedValue": {
+      "es": "El ID es inválido.",
+      "en": "Invalid ID"
+    }
+  },
+  {
+    "Key": "InvalidPagination",
+    "LocalizedValue": {
+      "es": "El valor de page debe ser mayor a 0 / El valor de pageSize debe estar entre 1 - 10",
+      "en": "The value of page must be greater than 0 / The value of pageSize must be between in 1 - 10"
+    }
+  },
+  {
+    "Key": "PaymentNotFound",
+    "LocalizedValue": {
+      "es": "Método de pago no encontrado.",
+      "en": "Payment method not found."
+    }
+  },
+  {
+    "Key": "ProductNotFound",
+    "LocalizedValue": {
+      "es": "Producto no encontrado.",
+      "en": "Product not found."
+    }
+  },
+  {
+    "Key": "StationNotFound",
+    "LocalizedValue": {
+      "es": "Estación no encontrada.",
+      "en": "Station not found."
+    }
+  },
+  {
+    "Key": "UserNotFound",
+    "LocalizedValue": {
+      "es": "Usuario no encontrado.",
+      "en": "User not found."
+    }
+  }
+]

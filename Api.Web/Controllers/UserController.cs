@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using Api.Domain.Models;
 using Api.Services.Services;
+using Api.Web.Middlewares;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
@@ -39,6 +40,7 @@ namespace Api.Web.Controllers
         [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [UserExists]
         public async Task<IActionResult> GetByIdAsync(string id)
         {
             var user = await _userRepository.GetByIdAsync(id);
@@ -49,6 +51,7 @@ namespace Api.Web.Controllers
 
         #region snippet_Create
 
+        [AllowAnonymous]
         [HttpPost]
         [ProducesResponseType(typeof(User), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -68,6 +71,7 @@ namespace Api.Web.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [UserExists]
         public async Task<IActionResult> UpdateByIdAsync(string id, [FromBody] JsonPatchDocument<User> replaceUser)
         {
             var user = await _userRepository.GetByIdAsync(id);
@@ -83,6 +87,7 @@ namespace Api.Web.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [UserExists]
         public async Task<IActionResult> DeleteByIdAsync(string id)
         {
             await _userManager.DeleteByIdAsync(id);

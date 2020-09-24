@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Api.Domain.Models;
 using Api.Repository.Repositories;
-using MongoDB.Driver;
 
 namespace Api.Services.Services
 {

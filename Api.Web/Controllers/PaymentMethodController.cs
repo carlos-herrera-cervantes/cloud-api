@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using Api.Domain.Models;
 using Api.Services.Services;
+using Api.Web.Middlewares;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
@@ -40,6 +41,7 @@ namespace Api.Web.Controllers
         [ProducesResponseType(typeof(PaymentMethod), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [PaymentMethodExists]
         public async Task<IActionResult> GetByIdAsync(string id)
         {
             var paymentMethod = await _paymentMethodRepository.GetByIdAsync(id);
@@ -69,6 +71,7 @@ namespace Api.Web.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [PaymentMethodExists]
         public async Task<IActionResult> UpdateByIdAsync(string id, [FromBody] JsonPatchDocument<PaymentMethod> replacePaymentMethod)
         {
             var paymentMethod = await _paymentMethodRepository.GetByIdAsync(id);
@@ -84,6 +87,7 @@ namespace Api.Web.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [PaymentMethodExists]
         public async Task<IActionResult> DeleteByIdAsync(string id)
         {
             await _paymentMethodManager.DeleteByIdAsync(id);

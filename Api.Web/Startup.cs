@@ -1,13 +1,18 @@
+using System.Collections.Generic;
+using System.Globalization;
 using Api.Infrastructure.Container;
 using Api.Repository.Managers;
 using Api.Repository.Repositories;
 using Api.Services.Services;
 using Api.Web.Extensions;
+using Api.Web.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Localization;
 
 namespace Api.Web
 {
@@ -19,7 +24,11 @@ namespace Api.Web
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers().AddNewtonsoftJson();
+            services.AddLocalization(options => options.ResourcesPath = "Resources");
+            services.AddControllers().AddNewtonsoftJson().AddDataAnnotationsLocalization(options =>
+            {
+                options.DataAnnotationLocalizerProvider = (type, factory) => factory.Create(typeof(SharedResources));
+            });
             services.AddTokenAuthentication(Configuration);
             services.AddServicesFromInfrastructure(Configuration);
             services.UseSwagger();
@@ -35,11 +44,28 @@ namespace Api.Web
             services.AddTransient<IProductRepository, ProductRepository>();
             services.AddTransient<ITokenManager, TokenManager>();
             services.AddTransient<ITokenRepository, TokenRepository>();
+            services.AddTransient<ICustomerPurchaseManager, CustomerPurchaseManager>();
+            services.AddTransient<ICustomerPurchaseRepository, CustomerPurchaseRepository>();
+            services.AddSingleton<IStringLocalizerFactory, JsonStringLocalizerFactory>();
+            services.AddSingleton<IStringLocalizer, JsonStringLocalizer>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment()) { app.UseDeveloperExceptionPage(); }
+
+            var cultures = new List<CultureInfo>
+            {
+                new CultureInfo("es"),
+                new CultureInfo("en")
+            };
+
+            app.UseRequestLocalization(options =>
+            {
+                options.DefaultRequestCulture = new RequestCulture("es");
+                options.SupportedCultures = cultures;
+                options.SupportedUICultures = cultures;
+            });
 
             app.UseAuthentication();
             app.UseSwagger();
