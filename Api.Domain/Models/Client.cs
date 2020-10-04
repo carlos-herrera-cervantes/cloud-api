@@ -4,7 +4,8 @@ namespace Api.Domain.Models
 {
     public class Client : BaseEntity
     {
-        [DataType(DataType.EmailAddress)]
+        [Required(ErrorMessage = "PurchaseClientEmailRequired")]
+        [DataType(DataType.EmailAddress, ErrorMessage = "InvalidEmail")]
         public string Email { get; set; }
     }
 }
