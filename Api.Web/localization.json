@@ -54,5 +54,243 @@
       "es": "Usuario no encontrado.",
       "en": "User not found."
     }
+  },
+  {
+    "key": "FirstNameRequired",
+    "LocalizedValue": {
+      "es": "El nombre es requerido.",
+      "en": "The first name is required."
+    }
+  },
+  {
+    "Key": "LastNameRequired",
+    "LocalizedValue": {
+      "es": "Los apellidos son requeridos.",
+      "en": "The last name is required."
+    }
+  },
+  {
+    "Key": "EmailRequired",
+    "LocalizedValue": {
+      "es": "El correo electrónico es requerido.",
+      "en": "The email address is required."
+    }
+  },
+  {
+    "Key": "InvalidEmail",
+    "LocalizedValue": {
+      "es": "El email es inválido.",
+      "en": "The email address is invalid."
+    }
+  },
+  {
+    "Key": "PasswordRequired",
+    "LocalizedValue": {
+      "es": "Las contraseña es requerida.",
+      "en": "The password is required."
+    }
+  },
+  {
+    "Key": "InvalidPassword",
+    "LocalizedValue": {
+      "es": "La contraseña debe ser de al menos 8 caracteres.",
+      "en": "The length of password must be at least 8 characters."
+    }
+  },
+  {
+    "Key": "StationNameRequired",
+    "LocalizedValue": {
+      "es": "El nombre de la estación es requerido.",
+      "en": "The station name is required."
+    }
+  },
+  {
+    "key": "StationKeyRequired",
+    "LocalizedValue": {
+      "es": "El identificador de la estación es requerido.",
+      "en": "The station key is required."
+    }
+  },
+  {
+    "Key": "StationStateRequired",
+    "LocalizedValue": {
+      "es": "El estado es requerido.",
+      "en": "The state is required."
+    }
+  },
+  {
+    "Key": "StationMunicipality",
+    "LocalizedValue": {
+      "es": "El municipio es requerido.",
+      "en": "The municipality is required."
+    }
+  },
+  {
+    "Key": "ProductDescriptionRequired",
+    "LocalizedValue": {
+      "es": "La descripción es requerida.",
+      "en": "The description is required."
+    }
+  },
+  {
+    "Key": "ProductPriceRequired",
+    "LocalizedValue": {
+      "es": "El precio de compra es requerido.",
+      "en": "The price of buy is required."
+    }
+  },
+  {
+    "Key": "ProductPricePublicRequired",
+    "LocalizedValue": {
+      "es": "El precio al público es requerido.",
+      "en": "The price for public is required."
+    }
+  },
+  {
+    "Key": "PaymentKeyRequired",
+    "LocalizedValue": {
+      "es": "La clave del pago es requerida.",
+      "en": "The payment key is required."
+    }
+  },
+  {
+    "Key": "PurchaseFolioRequired",
+    "LocalizedValue": {
+      "es": "El folio de la venta es requerido.",
+      "en": "The sale folio is required."
+    }
+  },
+  {
+    "Key": "PurchaseIvaRequired",
+    "LocalizedValue": {
+      "es": "El IVA de la venta es requerido.",
+      "en": "The sale vat is required."
+    }
+  },
+  {
+    "Key": "PurchaseSubtotalRequired",
+    "LocalizedValue": {
+      "es": "El subtotal de la venta es requerido.",
+      "en": "The sale subtotal is required."
+    }
+  },
+  {
+    "Key": "PurchaseTotalRequired",
+    "LocalizedValue": {
+      "es": "El total de la venta es requerido.",
+      "en": "The sale total is required."
+    }
+  },
+  {
+    "Key": "PurchaseTotalLettersRequired",
+    "LocalizedValue": {
+      "es": "El total en letras es requerido.",
+      "en": "The total letters is required."
+    }
+  },
+  {
+    "Key": "PurchaseEmployeeRequired",
+    "LocalizedValue": {
+      "es": "El ID del empleado es requerido.",
+      "en": "The employee ID is required."
+    }
+  },
+  {
+    "Key": "PurchaseProductRequired",
+    "LocalizedValue": {
+      "es": "No hay productos en la venta.",
+      "en": "There's no products in the sale."
+    }
+  },
+  {
+    "Key": "PurchasePaymentRequired",
+    "LocalizedValue": {
+      "es": "No hay pagos en la venta.",
+      "en": "There's no pauments in the sale."
+    }
+  },
+  {
+    "Key": "PurchaseClientRequired",
+    "LocalizedValue": {
+      "es": "La venta no tiene cliente.",
+      "en": "The sale doesn't have a client."
+    }
+  },
+  {
+    "Key": "PurchasePaymentQuantityRequired",
+    "LocalizedValue": {
+      "es": "La cantidad del pago es requerida.",
+      "en": "The payment quantity is required."
+    }
+  },
+  {
+    "Key": "PurchaseInvalidPaymentQuantity",
+    "LocalizedValue": {
+      "es": "La cantidad del pago debe ser mayor a 0.",
+      "en": "The payment quantity must be greater than 0."
+    }
+  },
+  {
+    "Key": "PurchaseClientEmailRequired",
+    "LocalizedValue": {
+      "es": "La dirección de correo electrónico del cliente es requerida.",
+      "en": "The client email address is required."
+    }
+  },
+  {
+    "Key": "PurchaseProductNameRequired",
+    "LocalizedValue": {
+      "es": "El nombre del producto es requerido.",
+      "en": "The product name is required."
+    }
+  },
+  {
+    "Key": "PurchaseProductQuantityRequired",
+    "LocalizedValue": {
+      "es": "La cantidad adquirida del producto es requerida.",
+      "en": "The purchased quantity of the product is required."
+    }
+  },
+  {
+    "Key": "PurchaseInvalidProductQuantity",
+    "LocalizedValue": {
+      "es": "La cantidad adquirida del producto debe ser mayor a cero.",
+      "en": "The purchased quantity of the product must be greater than zero."
+    }
+  },
+  {
+    "Key": "PurchaseProductPriceRequired",
+    "LocalizedValue": {
+      "es": "El precio unitario del producto es requerido.",
+      "en": "The unit price of the product is required."
+    }
+  },
+  {
+    "Key": "PurchaseInvalidProductPriceQuantity",
+    "LocalizedValue": {
+      "es": "El precio unitario del producto debe ser mayor a 0.",
+      "en": "The unit price of the product must be greater than 0."
+    }
+  },
+  {
+    "Key": "PurchaseProductPriceTotalRequired",
+    "LocalizedValue": {
+      "es": "El total del producto adquirido es requerido.",
+      "en": "The total of the purchased product is required."
+    }
+  },
+  {
+    "Key": "PurchaseInvalidProductPriceTotalQuantity",
+    "LocalizedValue": {
+      "es": "El total del producto adquirido debe ser mayor a 0.",
+      "en": "The total of the purchased product must be greater than 0."
+    }
+  },
+  {
+    "Key": "PurchaseProductMeasurementUnitRequired",
+    "LocalizedValue": {
+      "es": "El producto no tiene unidad de medida.",
+      "en": "The product does not have a unit of measure."
+    }
   }
 ]
