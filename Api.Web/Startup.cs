@@ -4,7 +4,9 @@ using Api.Infrastructure.Container;
 using Api.Repository.Managers;
 using Api.Repository.Repositories;
 using Api.Services.Services;
+using Api.Web.Backgrounds;
 using Api.Web.Extensions;
+using Api.Web.Handlers;
 using Api.Web.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -31,6 +33,7 @@ namespace Api.Web
             });
             services.AddTokenAuthentication(Configuration);
             services.AddServicesFromInfrastructure(Configuration);
+            services.AddFirebaseClient(Configuration);
             services.UseSwagger();
             services.AddScoped(typeof(IManager<>), typeof(Manager<>));
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
@@ -48,6 +51,8 @@ namespace Api.Web
             services.AddTransient<ICustomerPurchaseRepository, CustomerPurchaseRepository>();
             services.AddSingleton<IStringLocalizerFactory, JsonStringLocalizerFactory>();
             services.AddSingleton<IStringLocalizer, JsonStringLocalizer>();
+            services.AddSingleton<IOperationHandler, OperationHandler>();
+            services.AddHostedService<FirebaseConsumer>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
