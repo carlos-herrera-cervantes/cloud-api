@@ -1,7 +1,11 @@
 using System.Threading.Tasks;
+using Api.Domain.Constants;
 using Api.Domain.Models;
 using Api.Services.Services;
+using Api.Web.Common;
+using Api.Web.Handlers;
 using Api.Web.Middlewares;
+using Api.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
@@ -15,11 +19,13 @@ namespace Api.Web.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
+        private readonly string _collection = "users";
         private readonly IUserManager _userManager;
         private readonly IUserRepository _userRepository;
+        private readonly IOperationHandler _operationHandler;
 
-        public UserController(IUserManager userManager, IUserRepository userRepository)
-            => (_userManager, _userRepository) = (userManager, userRepository);
+        public UserController(IUserManager userManager, IUserRepository userRepository, IOperationHandler operationHandler)
+            => (_userManager, _userRepository, _operationHandler) = (userManager, userRepository, operationHandler);
 
         #region snippet_GetAll
 
@@ -59,6 +65,14 @@ namespace Api.Web.Controllers
         public async Task<IActionResult> CreateAsync(User user)
         {
             await _userManager.CreateAsync(user);
+            Emitter.EmitMessage(_operationHandler, new CollectionEventReceived
+            {
+                Type = EventType.Create,
+                Collection = _collection,
+                Id = string.Empty,
+                Model = user
+            });
+
             return Created("", new { Status = true, Data = user });
         }
 
@@ -76,6 +90,14 @@ namespace Api.Web.Controllers
         {
             var user = await _userRepository.GetByIdAsync(id);
             await _userManager.UpdateByIdAsync(id, user, replaceUser);
+            Emitter.EmitMessage(_operationHandler, new CollectionEventReceived
+            {
+                Type = EventType.Update,
+                Collection = _collection,
+                Id = id,
+                Model = user
+            });
+            
             return Created("", new { Status = true, Data = user });
         }
 
@@ -91,6 +113,14 @@ namespace Api.Web.Controllers
         public async Task<IActionResult> DeleteByIdAsync(string id)
         {
             await _userManager.DeleteByIdAsync(id);
+            Emitter.EmitMessage(_operationHandler, new CollectionEventReceived
+            {
+                Type = EventType.Delete,
+                Collection = _collection,
+                Id = id,
+                Model = null
+            });
+
             return NoContent();
         }
 

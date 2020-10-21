@@ -1,7 +1,11 @@
 using System.Threading.Tasks;
+using Api.Domain.Constants;
 using Api.Domain.Models;
 using Api.Services.Services;
+using Api.Web.Common;
+using Api.Web.Handlers;
 using Api.Web.Middlewares;
+using Api.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
@@ -15,12 +19,13 @@ namespace Api.Web.Controllers
     [ApiController]
     public class ProductController : ControllerBase
     {
+        private readonly string _collection = "products";
         private readonly IProductManager _productManager;
-
         private readonly IProductRepository _productRepository;
+        private readonly IOperationHandler _operationHandler;
 
-        public ProductController(IProductManager productManager, IProductRepository productRepository)
-            => (_productManager, _productRepository) = (productManager, productRepository);
+        public ProductController(IProductManager productManager, IProductRepository productRepository, IOperationHandler operationHandler)
+            => (_productManager, _productRepository, _operationHandler) = (productManager, productRepository, operationHandler);
 
         #region snippet_GetAll
 
@@ -59,6 +64,14 @@ namespace Api.Web.Controllers
         public async Task<IActionResult> CreateAsync(Product product)
         {
             await _productManager.CreateAsync(product);
+            Emitter.EmitMessage(_operationHandler, new CollectionEventReceived
+            {
+                Type = EventType.Create,
+                Collection = _collection,
+                Id = string.Empty,
+                Model = product
+            });
+
             return Created("", new { Status = true, Data = product });
         }
 
@@ -76,6 +89,14 @@ namespace Api.Web.Controllers
         {
             var product = await _productRepository.GetByIdAsync(id);
             await _productManager.UpdateByIdAsync(id, product, replaceProduct);
+            Emitter.EmitMessage(_operationHandler, new CollectionEventReceived
+            {
+                Type = EventType.Update,
+                Collection = _collection,
+                Id = id,
+                Model = product
+            });
+
             return Created("", new { Status = true, Data = product });
         }
 
@@ -91,6 +112,14 @@ namespace Api.Web.Controllers
         public async Task<IActionResult> DeleteByIdAsync(string id)
         {
             await _productManager.DeleteByIdAsync(id);
+            Emitter.EmitMessage(_operationHandler, new CollectionEventReceived
+            {
+                Type = EventType.Delete,
+                Collection = _collection,
+                Id = id,
+                Model = null
+            });
+
             return NoContent();
         }
 
