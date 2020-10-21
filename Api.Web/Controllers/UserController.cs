@@ -70,6 +70,7 @@ namespace Api.Web.Controllers
                 Type = EventType.Create,
                 Collection = _collection,
                 Id = string.Empty,
+                StationId = user.StationId,
                 Model = user
             });
 
@@ -95,6 +96,7 @@ namespace Api.Web.Controllers
                 Type = EventType.Update,
                 Collection = _collection,
                 Id = id,
+                StationId = user.StationId,
                 Model = user
             });
             
@@ -112,12 +114,14 @@ namespace Api.Web.Controllers
         [UserExists]
         public async Task<IActionResult> DeleteByIdAsync(string id)
         {
+            var user = await _userRepository.GetByIdAsync(id);
             await _userManager.DeleteByIdAsync(id);
             Emitter.EmitMessage(_operationHandler, new CollectionEventReceived
             {
                 Type = EventType.Delete,
                 Collection = _collection,
                 Id = id,
+                StationId = user.StationId,
                 Model = null
             });
 

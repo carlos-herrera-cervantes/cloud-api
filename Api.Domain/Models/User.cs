@@ -1,5 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Api.Domain.Constants;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace Api.Domain.Models
 {
@@ -20,5 +22,8 @@ namespace Api.Domain.Models
         public string Password { get; set; }
 
         public string Role { get; set; } = Roles.Employee;
+
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string StationId { get; set; }
     }
 }

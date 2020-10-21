@@ -1,7 +1,11 @@
 using System.Threading.Tasks;
+using Api.Domain.Constants;
 using Api.Domain.Models;
 using Api.Services.Services;
+using Api.Web.Common;
+using Api.Web.Handlers;
 using Api.Web.Middlewares;
+using Api.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
@@ -15,12 +19,17 @@ namespace Api.Web.Controllers
     [ApiController]
     public class PaymentMethodController : ControllerBase
     {
+        private readonly string _collection = "payments";
         private readonly IPaymentMethodManager _paymentMethodManager;
-
         private readonly IPaymentMethodRepository _paymentMethodRepository;
+        private readonly IOperationHandler _operationHandler;
 
-        public PaymentMethodController(IPaymentMethodManager paymentMethodManager, IPaymentMethodRepository paymentMethodRepository)
-            => (_paymentMethodManager, _paymentMethodRepository) = (paymentMethodManager, paymentMethodRepository);
+        public PaymentMethodController(
+            IPaymentMethodManager paymentMethodManager, 
+            IPaymentMethodRepository paymentMethodRepository, 
+            IOperationHandler operationHandler
+        )
+        => (_paymentMethodManager, _paymentMethodRepository, _operationHandler) = (paymentMethodManager, paymentMethodRepository, operationHandler);
 
         #region snippet_GetAll
 
@@ -59,6 +68,14 @@ namespace Api.Web.Controllers
         public async Task<IActionResult> CreateAsync(PaymentMethod paymentMethod)
         {
             await _paymentMethodManager.CreateAsync(paymentMethod);
+            Emitter.EmitMessage(_operationHandler, new CollectionEventReceived
+            {
+                Type = EventType.Create,
+                Collection = _collection,
+                Id = string.Empty,
+                Model = paymentMethod
+            });
+            
             return Created("", new { Status = true, Data = paymentMethod });
         }
 
@@ -76,6 +93,14 @@ namespace Api.Web.Controllers
         {
             var paymentMethod = await _paymentMethodRepository.GetByIdAsync(id);
             await _paymentMethodManager.UpdateByIdAsync(id, paymentMethod, replacePaymentMethod);
+            Emitter.EmitMessage(_operationHandler, new CollectionEventReceived
+            {
+                Type = EventType.Update,
+                Collection = _collection,
+                Id = id,
+                Model = paymentMethod
+            });
+
             return Created("", new { Status = true, Data = paymentMethod });
         }
 
@@ -91,6 +116,14 @@ namespace Api.Web.Controllers
         public async Task<IActionResult> DeleteByIdAsync(string id)
         {
             await _paymentMethodManager.DeleteByIdAsync(id);
+            Emitter.EmitMessage(_operationHandler, new CollectionEventReceived
+            {
+                Type = EventType.Delete,
+                Collection = _collection,
+                Id = id,
+                Model = null
+            });
+
             return NoContent();
         }
 

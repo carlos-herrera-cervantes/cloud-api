@@ -1,7 +1,11 @@
 ﻿using System.Threading.Tasks;
+using Api.Domain.Constants;
 using Api.Domain.Models;
 using Api.Services.Services;
+using Api.Web.Common;
+using Api.Web.Handlers;
 using Api.Web.Middlewares;
+using Api.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
@@ -15,11 +19,13 @@ namespace Api.Web.Controllers
     [ApiController]
     public class StationController : ControllerBase
     {
+        private readonly string _collection = "stations";
         private readonly IStationManager _stationManager;
         private readonly IStationRepository _stationRepository;
+        private readonly IOperationHandler _operationHandler;
 
-        public StationController(IStationManager stationManager, IStationRepository stationRepository)
-            => (_stationManager, _stationRepository) = (stationManager, stationRepository);
+        public StationController(IStationManager stationManager, IStationRepository stationRepository, IOperationHandler operationHandler)
+            => (_stationManager, _stationRepository, _operationHandler) = (stationManager, stationRepository, operationHandler);
 
         #region snippet_GetAll
 
@@ -58,6 +64,14 @@ namespace Api.Web.Controllers
         public async Task<IActionResult> CreateAsync(Station station)
         {
             await _stationManager.CreateAsync(station);
+            Emitter.EmitMessage(_operationHandler, new CollectionEventReceived
+            {
+                Type = EventType.Create,
+                Collection = _collection,
+                Id = string.Empty,
+                Model = station
+            });
+            
             return Created("", new { Status = true, Data = station });
         }
 
@@ -75,6 +89,14 @@ namespace Api.Web.Controllers
         {
             var station = await _stationRepository.GetByIdAsync(id);
             await _stationManager.UpdateByIdAsync(id, station, replaceStation);
+            Emitter.EmitMessage(_operationHandler, new CollectionEventReceived
+            {
+                Type = EventType.Update,
+                Collection = _collection,
+                Id = id,
+                Model = station
+            });
+
             return Created("", new { Status = true, Data = station });
         }
 
@@ -90,6 +112,14 @@ namespace Api.Web.Controllers
         public async Task<IActionResult> DeleteByIdAsync(string id)
         {
             await _stationManager.DeleteByIdAsync(id);
+            Emitter.EmitMessage(_operationHandler, new CollectionEventReceived
+            {
+                Type = EventType.Delete,
+                Collection = _collection,
+                Id = id,
+                Model = null
+            });
+            
             return NoContent();
         }
 

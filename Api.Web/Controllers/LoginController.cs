@@ -7,6 +7,7 @@ using Api.Services.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Localization;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Api.Web.Controllers
@@ -19,9 +20,15 @@ namespace Api.Web.Controllers
         private readonly IUserRepository _userRepository;
         private readonly IConfiguration _configuration;
         private readonly ITokenManager _tokenManager;
+        private readonly IStringLocalizer<SharedResources> _localizer;
 
-        public LoginController(IUserRepository userRepository, IConfiguration configuration, ITokenManager tokenManager)
-            => (_userRepository, _configuration, _tokenManager) = (userRepository, configuration, tokenManager);
+        public LoginController(
+            IUserRepository userRepository, 
+            IConfiguration configuration, 
+            ITokenManager tokenManager,
+            IStringLocalizer<SharedResources> localizer
+        )
+        => (_userRepository, _configuration, _tokenManager, _localizer) = (userRepository, configuration, tokenManager, localizer);
 
         #region snippet_Login
 
@@ -30,7 +37,7 @@ namespace Api.Web.Controllers
         {
             var token = await GetToken(credentials);
 
-            if (token is false) return NotFound(new { Status = false, Code = "NotFound" });
+            if (token is false) return NotFound(new { Status = false, Code = "InvalidCredentials", Message = _localizer["InvalidCredentials"].Value });
 
             var user = await GetUserByEmail(credentials.Email);
             var accessToken = new AccessToken

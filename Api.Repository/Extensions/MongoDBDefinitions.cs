@@ -13,7 +13,7 @@ namespace Api.Repository.Extensions
         public static FilterDefinition<T> BuildFilter<T>(Request request) where T : BaseEntity
         {
             var (_, filters) = request;
-            if (filters.IsEmpty()) return Builders<T>.Filter.Exists("_id", true);
+            if (filters.IsEmpty()) return Builders<T>.Filter.Empty;
             var lambda = GenerateFilter<T>(filters);
             return Builders<T>.Filter.Where(lambda);
         }

@@ -1,5 +1,12 @@
 [
   {
+    "Key": "InvalidCredentials",
+    "LocalizedValue": {
+      "es": "Usuario o contraseña incorrectos.",
+      "en": "Wrong user or password."
+    }
+  },
+  {
     "Key": "InvalidPermissions",
     "LocalizedValue": {
       "es": "No tienes suficientes permisos para ejecutar esta acción.",
