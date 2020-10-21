@@ -40,11 +40,13 @@ namespace Api.Web.Backgrounds
 
         private Task SelectQueryByModel(CollectionEventReceived message)
         {
-            var (type, collection, id, model) = message;
+            var (type, collection, id, stationId, model) = message;
             return collection switch
             {
-                "users" => BuildQueryUsers(type, id, model),
+                "users" => BuildQueryUsers(type, id, stationId, model),
                 "products" => BuildQueryProducts(type, id, model),
+                "payments" => BuildQueryPaymentMethod(type, id, model),
+                "stations" => BuildQueryStation(type, id, model),
                 _ => System.Console.Out.WriteLineAsync("No matches models")
             };
         }
@@ -53,11 +55,11 @@ namespace Api.Web.Backgrounds
 
         #region BuildFirebaseQueryForUsersCollection
 
-        private Task BuildQueryUsers(string typeOperation, string id, BaseEntity user) => typeOperation switch
+        private Task BuildQueryUsers(string typeOperation, string id, string stationId, BaseEntity user) => typeOperation switch
         {
-            "Create" => _firebaseClient.Child($"{_path}/users/{user.Id}").PostAsync(user),
-            "Update" => _firebaseClient.Child($"{_path}/users/{id}").PutAsync(user),
-            "Delete" => _firebaseClient.Child($"{_path}/users/{id}").DeleteAsync(),
+            "Create" => _firebaseClient.Child($"{_path}/stations/{stationId}/users/{user.Id}").PostAsync(user),
+            "Update" => _firebaseClient.Child($"{_path}/stations/{stationId}/users/{id}").PutAsync(user),
+            "Delete" => _firebaseClient.Child($"{_path}/stations/{stationId}/users/{id}").DeleteAsync(),
             _ => System.Console.Out.WriteLineAsync("No matches operations for users collection")
         };
 
@@ -71,6 +73,30 @@ namespace Api.Web.Backgrounds
             "Update" => _firebaseClient.Child($"{_path}/products/{id}").PutAsync(product),
             "Delete" => _firebaseClient.Child($"{_path}/products/{id}").DeleteAsync(),
             _ => System.Console.Out.WriteLineAsync("No matches operations for products collection")
+        };
+
+        #endregion
+
+        #region BuildFirebaseQueryForPaymentMethodCollection
+
+        private Task BuildQueryPaymentMethod(string typeOperation, string id, BaseEntity paymentMethod) => typeOperation switch
+        {
+            "Create" => _firebaseClient.Child($"{_path}/payments/{paymentMethod.Id}").PostAsync(paymentMethod),
+            "Update" => _firebaseClient.Child($"{_path}/payments/{id}").PutAsync(paymentMethod),
+            "Delete" => _firebaseClient.Child($"{_path}/payments/{id}").DeleteAsync(),
+            _ => System.Console.Out.WriteLineAsync("No matches operations for payments collection")
+        };
+
+        #endregion
+
+        #region BuildFirebaseQueryForStationCollection
+
+        private Task BuildQueryStation(string typeOperation, string id, BaseEntity station) => typeOperation switch
+        {
+            "Create" => _firebaseClient.Child($"{_path}/stations/{station.Id}").PostAsync(station),
+            "Update" => _firebaseClient.Child($"{_path}/stations/{id}").PutAsync(station),
+            "Delete" => _firebaseClient.Child($"{_path}/stations/{id}").DeleteAsync(),
+            _ => System.Console.Out.WriteLineAsync("No matches operations for stations collection")
         };
 
         #endregion

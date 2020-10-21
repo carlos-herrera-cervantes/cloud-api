@@ -32,6 +32,8 @@ namespace Api.Web.Middlewares
                         context.Result = new NotFoundObjectResult(new { Status = false, Message = _localizer["PaymentNotFound"].Value, Code = "PaymentNotFound" });
                         return;
                     }
+
+                    await next();
                 }
                 catch (FormatException)
                 {
