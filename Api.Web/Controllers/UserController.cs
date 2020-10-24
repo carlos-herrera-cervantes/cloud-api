@@ -69,7 +69,7 @@ namespace Api.Web.Controllers
             {
                 Type = EventType.Create,
                 Collection = _collection,
-                Id = string.Empty,
+                Id = user.Id,
                 StationId = user.StationId,
                 Model = user
             });
