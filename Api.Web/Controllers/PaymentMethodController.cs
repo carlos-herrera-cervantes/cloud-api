@@ -72,7 +72,7 @@ namespace Api.Web.Controllers
             {
                 Type = EventType.Create,
                 Collection = _collection,
-                Id = string.Empty,
+                Id = paymentMethod.Id,
                 Model = paymentMethod
             });
             
