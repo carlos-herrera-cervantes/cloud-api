@@ -32,6 +32,7 @@ namespace Api.Web.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(Station), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [Role(roles: new [] { Roles.SuperAdmin, Roles.StationAdmin })]
         public async Task<IActionResult> GetAllAsync()
         {
             var stations = await _stationRepository.GetAllAsync();
@@ -46,6 +47,7 @@ namespace Api.Web.Controllers
         [ProducesResponseType(typeof(Station), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [Role(roles: new [] { Roles.SuperAdmin, Roles.StationAdmin })]
         [StationExists]
         public async Task<IActionResult> GetByIdAsync(string id)
         {
@@ -61,6 +63,7 @@ namespace Api.Web.Controllers
         [ProducesResponseType(typeof(Station), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [Role(roles: new [] { Roles.SuperAdmin })]
         public async Task<IActionResult> CreateAsync(Station station)
         {
             await _stationManager.CreateAsync(station);
@@ -84,6 +87,7 @@ namespace Api.Web.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [Role(roles: new [] { Roles.SuperAdmin, Roles.StationAdmin })]
         [StationExists]
         public async Task<IActionResult> UpdateByIdAsync(string id, [FromBody] JsonPatchDocument<Station> replaceStation)
         {
@@ -108,6 +112,7 @@ namespace Api.Web.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [Role(roles: new [] { Roles.SuperAdmin })]
         [StationExists]
         public async Task<IActionResult> DeleteByIdAsync(string id)
         {
