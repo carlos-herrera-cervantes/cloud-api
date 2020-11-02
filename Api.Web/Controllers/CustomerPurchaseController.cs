@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Api.Domain.Constants;
 using Api.Domain.Models;
 using Api.Services.Services;
 using Api.Web.Middlewares;
@@ -25,6 +26,7 @@ namespace Api.Web.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(CustomerPurchase), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [Role(roles: new [] { Roles.SuperAdmin, Roles.StationAdmin, Roles.Employee })]
         public async Task<IActionResult> GetAllAsync()
         {
             var purchases = await _customerPurchaseRepository.GetAllAsync();
@@ -39,6 +41,7 @@ namespace Api.Web.Controllers
         [ProducesResponseType(typeof(CustomerPurchase), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [Role(roles: new [] { Roles.SuperAdmin, Roles.StationAdmin, Roles.Employee })]
         [CustomerPurchaseExists]
         public async Task<IActionResult> GetByIdAsync(string id)
         {

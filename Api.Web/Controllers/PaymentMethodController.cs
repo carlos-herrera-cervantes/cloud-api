@@ -36,6 +36,7 @@ namespace Api.Web.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(PaymentMethod), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [Role(roles: new [] { Roles.SuperAdmin, Roles.StationAdmin })]
         public async Task<IActionResult> GetAllAsync()
         {
             var paymentMethods = await _paymentMethodRepository.GetAllAsync();
@@ -50,6 +51,7 @@ namespace Api.Web.Controllers
         [ProducesResponseType(typeof(PaymentMethod), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [Role(roles: new [] { Roles.SuperAdmin, Roles.StationAdmin })]
         [PaymentMethodExists]
         public async Task<IActionResult> GetByIdAsync(string id)
         {
@@ -65,6 +67,7 @@ namespace Api.Web.Controllers
         [ProducesResponseType(typeof(PaymentMethod), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [Role(roles: new [] { Roles.SuperAdmin, Roles.StationAdmin })]
         public async Task<IActionResult> CreateAsync(PaymentMethod paymentMethod)
         {
             await _paymentMethodManager.CreateAsync(paymentMethod);
@@ -88,6 +91,7 @@ namespace Api.Web.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [Role(roles: new [] { Roles.SuperAdmin, Roles.StationAdmin })]
         [PaymentMethodExists]
         public async Task<IActionResult> UpdateByIdAsync(string id, [FromBody] JsonPatchDocument<PaymentMethod> replacePaymentMethod)
         {
@@ -112,6 +116,7 @@ namespace Api.Web.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [Role(roles: new [] { Roles.SuperAdmin, Roles.StationAdmin })]
         [PaymentMethodExists]
         public async Task<IActionResult> DeleteByIdAsync(string id)
         {
