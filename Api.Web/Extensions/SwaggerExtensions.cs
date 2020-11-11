@@ -9,7 +9,7 @@ namespace Api.Web.Extensions
         {
             services.AddSwaggerGen(c => 
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Gulf Remastered - Local API", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Remastered - Local API", Version = "v1" });
             });
             return services;
         }
