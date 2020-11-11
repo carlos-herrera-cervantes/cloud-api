@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Api.Domain.Models;
 using Api.Services.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Localization;
@@ -12,8 +13,8 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Api.Web.Controllers
 {
-    [AllowAnonymous]
-    [Route("api/v1/login")]
+    [Authorize]
+    [Route("api/v1/auth")]
     [ApiController]
     public class LoginController : ControllerBase
     {
@@ -32,7 +33,9 @@ namespace Api.Web.Controllers
 
         #region snippet_Login
 
-        [HttpPost]
+        [AllowAnonymous]
+        [HttpPost("login")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Login(Credentials credentials)
         {
             var token = await GetToken(credentials);
@@ -51,6 +54,14 @@ namespace Api.Web.Controllers
             await _tokenManager.CreateAsync(accessToken);
             return Ok(new { Status = true, Data = token });
         }
+
+        #endregion
+
+        #region snippet_Logout
+
+        [HttpPost("logout")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<IActionResult> Logout() => await Task.FromResult(NoContent());
 
         #endregion
 
