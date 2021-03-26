@@ -37,10 +37,12 @@ namespace Api.Web.Controllers
         [ProducesResponseType(typeof(PaymentMethod), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Role(roles: new [] { Roles.SuperAdmin, Roles.StationAdmin })]
-        public async Task<IActionResult> GetAllAsync()
+        [SetPaginate]
+        public async Task<IActionResult> GetAllAsync([FromQuery] Request request)
         {
-            var paymentMethods = await _paymentMethodRepository.GetAllAsync();
-            return Ok(new { Status = true, Data = paymentMethods });
+            var totalDocuments = await _paymentMethodRepository.CountAsync(request);
+            var paymentMethods = await _paymentMethodRepository.GetAllAsync(request);
+            return Ok(new { Status = true, Data = paymentMethods, Paginator = Paginator.Paginate(request, totalDocuments) });
         }
 
         #endregion

@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
 
@@ -19,19 +18,16 @@ namespace Api.Domain.Models
         [BsonElement("quantity")]
         [JsonProperty("quantity")]
         [Required(ErrorMessage = "PurchaseProductQuantityRequired")]
-        [Range(typeof(Decimal), "1", "1000000000000000000", ErrorMessage = "PurchaseInvalidProductQuantity")]
         public int? Quantity { get; set; }
 
         [BsonElement("priceUnit")]
         [JsonProperty("priceUnit")]
         [Required(ErrorMessage = "PurchaseProductPriceRequired")]
-        [Range(typeof(Decimal), "1", "1000000000000000000", ErrorMessage = "PurchaseInvalidProductPriceQuantity")]
         public decimal? PriceUnit { get; set; }
 
         [BsonElement("price")]
         [JsonProperty("price")]
         [Required(ErrorMessage = "PurchaseProductPriceTotalRequired")]
-        [Range(typeof(Decimal), "1", "1000000000000000000", ErrorMessage = "PurchaseInvalidProductPriceTotalQuantity")]
         public decimal? Price { get; set; }
 
         [BsonElement("measurementUnit")]
