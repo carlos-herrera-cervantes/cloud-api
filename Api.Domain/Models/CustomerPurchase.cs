@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
@@ -7,6 +8,8 @@ namespace Api.Domain.Models
 {
     public class CustomerPurchase : BaseEntity
     {
+        #region snippet_Properties
+
         [BsonElement("folio")]
         [JsonProperty("folio")]
         [Required(ErrorMessage = "PurchaseFolioRequired")]
@@ -54,5 +57,37 @@ namespace Api.Domain.Models
         [JsonProperty("client")]
         [Required(ErrorMessage = "PurchaseClientRequired")]
         public Client Client { get; set; }
+
+        #endregion
+
+        #region snippet_References
+
+        [BsonElement("station")]
+        [JsonProperty("station")]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Station { get; set; }
+
+        [BsonIgnoreIfNull]
+        [JsonProperty("stationsEmbedded", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public Station StationsEmbedded { get; set; } = null;
+
+        #endregion
+
+        #region snippet_Populate
+
+        [BsonIgnore]
+        [JsonIgnore]
+        public static List<Relation> Relations { get; } = new List<Relation>
+        {
+            new Relation
+            {
+                Entity = "Stations",
+                LocalKey = "Station",
+                ForeignKey = "_id",
+                JustOne = true
+            }
+        };
+
+        #endregion
     }
 }

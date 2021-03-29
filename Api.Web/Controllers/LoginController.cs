@@ -1,3 +1,4 @@
+using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -76,7 +77,8 @@ namespace Api.Web.Controllers
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = claims,
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_configuration.GetValue<string>("SecretKey"))), SecurityAlgorithms.HmacSha256Signature)
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_configuration.GetValue<string>("SecretKey"))), SecurityAlgorithms.HmacSha256Signature),
+                Expires = DateTime.UtcNow.AddDays(5)
             };
             var tokenHandler = new JwtSecurityTokenHandler();
             var createdToken = tokenHandler.CreateToken(tokenDescriptor);

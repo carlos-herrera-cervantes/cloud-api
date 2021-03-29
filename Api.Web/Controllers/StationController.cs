@@ -33,10 +33,12 @@ namespace Api.Web.Controllers
         [ProducesResponseType(typeof(Station), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Role(roles: new [] { Roles.SuperAdmin, Roles.StationAdmin })]
-        public async Task<IActionResult> GetAllAsync()
+        [SetPaginate]
+        public async Task<IActionResult> GetAllAsync([FromQuery] Request request)
         {
-            var stations = await _stationRepository.GetAllAsync();
-            return Ok(new { Status = true, Data = stations });
+            var totalDocuments = await _stationRepository.CountAsync(request);
+            var stations = await _stationRepository.GetAllAsync(request);
+            return Ok(new { Status = true, Data = stations, Paginator = Paginator.Paginate(request, totalDocuments) });
         }
 
         #endregion

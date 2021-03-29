@@ -6,10 +6,12 @@ namespace Api.Services.Services
 {
     public interface IUserRepository
     {
-         Task<IEnumerable<User>> GetAllAsync();
+        Task<IEnumerable<User>> GetAllAsync(Request request);
 
         Task<User> GetByIdAsync(string id);
 
         Task<User> GetOneAsync(Request request);
+
+        Task<int> CountAsync(Request request);
     }
 }

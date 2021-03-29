@@ -4,41 +4,61 @@ namespace Api.Domain.Models
 {
     public class Request
     {
+        #region snippet_PrivateProperties
+
+        private int _pageSize;
+
+        #endregion
+
         #region snippet_Properties
 
         [FromQuery(Name = "sort")]
-        public string Sort { get; set; }
+        public string Sort { get; set; } = null;
 
         [FromQuery(Name = "pageSize")]
-        public int PageSize { get; set; } = 10;
+        public int PageSize
+        {
+            get => _pageSize;
+            set
+            {
+                if (value < 1)
+                {
+                    _pageSize = 10;
+                }
+                else if (value > 100)
+                {
+                    _pageSize = 100;
+                }
+                else
+                {
+                    _pageSize = value;
+                }
+            }
+        }
 
         [FromQuery(Name = "page")]
-        public int Page { get; set; } = 1;
-
-        [FromQuery(Name = "paginate")]
-        public bool Paginate { get; set; } = false;
+        public int Page { get; set; } = 0;
 
         [FromQuery(Name = "relation")]
-        public string[] Entities { get; set; } = new [] { "Empty" };
+        public string[] Entities { get; set; } = new string[0];
 
         [FromQuery(Name = "filter")]
-        public string[] Filters { get; set; }
+        public string[] Filters { get; set; } =  new string[0];
 
         #endregion
 
         #region snippet_Deconstruct
 
-        public void Deconstruct(out string sort, out int pageSize, out int page, out bool paginate, out string[] entities, out string[] filters)
+        public void Deconstruct(out string sort, out int pageSize, out int page, out string[] entities, out string[] filters)
         {
             sort = Sort;
             pageSize = PageSize;
             page = Page;
-            paginate = Paginate;
             entities = Entities;
             filters = Filters;
         }
 
-        public void Deconstruct(out bool paginate, out string[] filters) => (paginate, filters) = (Paginate, Filters);
+        public void Deconstruct(out string sort, out string[] filters) => (sort, filters) = (Sort, Filters);
 
         #endregion
     }

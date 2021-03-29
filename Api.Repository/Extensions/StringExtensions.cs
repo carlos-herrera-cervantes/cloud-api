@@ -8,6 +8,8 @@ namespace Api.Repository.Extensions
 {
     public static class StringExtensions
     {
+        /// <summary>Classify a string in type operator</summary>
+        /// <returns>A TypeOperator object</returns>
         public static TypeOperator ClassifyOperation(this string value) =>
             Regex.IsMatch(value, Operators.NotSameRegex) ? new TypeOperator { 
                 Key = Regex.Split(value, Operators.NotSameRegex).First(),

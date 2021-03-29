@@ -33,10 +33,12 @@ namespace Api.Web.Controllers
         [ProducesResponseType(typeof(Product), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Role(roles: new [] { Roles.SuperAdmin, Roles.StationAdmin, Roles.Employee } )]
-        public async Task<IActionResult> GetAllAsync()
+        [SetPaginate]
+        public async Task<IActionResult> GetAllAsync([FromQuery] Request request)
         {
-            var products = await _productRepository.GetAllAsync();
-            return Ok(new { Status = true, Data = products });
+            var totalDocuments = await _productRepository.CountAsync(request);
+            var products = await _productRepository.GetAllAsync(request);
+            return Ok(new { Status = true, Data = products, Paginator = Paginator.Paginate(request, totalDocuments) });
         }
 
         #endregion

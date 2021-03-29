@@ -6,10 +6,12 @@ namespace Api.Repository.Repositories
 {
     public interface IRepository<T> where T : BaseEntity
     {
-        Task<IEnumerable<T>> GetAllAsync();
+        Task<IEnumerable<T>> GetAllAsync(Request request, List<Relation> relations);
 
         Task<T> GetByIdAsync(string id);
 
         Task<T> GetOneAsync(Request request);
+
+        Task<int> CountAsync(Request request);
     }
 }

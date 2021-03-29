@@ -32,10 +32,12 @@ namespace Api.Web.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [SetPaginate]
         public async Task<IActionResult> GetAllAsync([FromQuery] Request request)
         {
-            var users = await _userRepository.GetAllAsync();
-            return Ok(new { Status = true, Data = users });
+            var totalDocuments = await _userRepository.CountAsync(request);
+            var users = await _userRepository.GetAllAsync(request);
+            return Ok(new { Status = true, Data = users, Paginator = Paginator.Paginate(request, totalDocuments) });
         }
 
         #endregion

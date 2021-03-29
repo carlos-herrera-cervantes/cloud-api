@@ -1,10 +1,7 @@
-using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Api.Domain.Models;
 using Api.Repository.Repositories;
-using MongoDB.Driver;
 
 namespace Api.Services.Services
 {
@@ -14,10 +11,12 @@ namespace Api.Services.Services
 
         public UserRepository(IRepository<User> userRepository) => _userRepository = userRepository;
 
-        public async Task<IEnumerable<User>> GetAllAsync() => await _userRepository.GetAllAsync();
+        public async Task<IEnumerable<User>> GetAllAsync(Request request) => await _userRepository.GetAllAsync(request, null);
 
         public async Task<User> GetByIdAsync(string id) => await _userRepository.GetByIdAsync(id);
 
         public async Task<User> GetOneAsync(Request request) => await _userRepository.GetOneAsync(request);
+
+        public async Task<int> CountAsync(Request request) => await _userRepository.CountAsync(request);
     }
 }
