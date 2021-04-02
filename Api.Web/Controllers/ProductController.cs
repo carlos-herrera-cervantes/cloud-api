@@ -24,8 +24,16 @@ namespace Api.Web.Controllers
         private readonly IProductRepository _productRepository;
         private readonly IOperationHandler _operationHandler;
 
-        public ProductController(IProductManager productManager, IProductRepository productRepository, IOperationHandler operationHandler)
-            => (_productManager, _productRepository, _operationHandler) = (productManager, productRepository, operationHandler);
+        public ProductController(
+            IProductManager productManager,
+            IProductRepository productRepository,
+            IOperationHandler operationHandler
+        )
+        {
+            _productManager = productManager;
+            _productRepository = productRepository;
+            _operationHandler = operationHandler;
+        }
 
         #region snippet_GetAll
 
@@ -38,7 +46,12 @@ namespace Api.Web.Controllers
         {
             var totalDocuments = await _productRepository.CountAsync(request);
             var products = await _productRepository.GetAllAsync(request);
-            return Ok(new { Status = true, Data = products, Paginator = Paginator.Paginate(request, totalDocuments) });
+            return Ok(new
+                {
+                    Status = true,
+                    Data = products,
+                    Paginator = Paginator.Paginate(request, totalDocuments)
+                });
         }
 
         #endregion

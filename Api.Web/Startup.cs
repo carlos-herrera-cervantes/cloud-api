@@ -33,7 +33,6 @@ namespace Api.Web
             });
             services.AddTokenAuthentication(Configuration);
             services.AddServicesFromInfrastructure(Configuration);
-            services.AddFirebaseClient(Configuration);
             services.UseSwagger();
             services.AddScoped(typeof(IManager<>), typeof(Manager<>));
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
@@ -52,6 +51,7 @@ namespace Api.Web
             services.AddSingleton<IStringLocalizerFactory, JsonStringLocalizerFactory>();
             services.AddSingleton<IStringLocalizer, JsonStringLocalizer>();
             services.AddSingleton<IOperationHandler, OperationHandler>();
+            services.AddFirebaseClient(Configuration);
             services.AddHostedService<FirebaseConsumer>();
         }
 

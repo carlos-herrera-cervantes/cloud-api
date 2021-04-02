@@ -24,21 +24,34 @@ namespace Api.Web.Controllers
         private readonly IStationRepository _stationRepository;
         private readonly IOperationHandler _operationHandler;
 
-        public StationController(IStationManager stationManager, IStationRepository stationRepository, IOperationHandler operationHandler)
-            => (_stationManager, _stationRepository, _operationHandler) = (stationManager, stationRepository, operationHandler);
+        public StationController(
+            IStationManager stationManager,
+            IStationRepository stationRepository,
+            IOperationHandler operationHandler
+        )
+        {
+            _stationManager = stationManager;
+            _stationRepository = stationRepository;
+            _operationHandler = operationHandler;
+        }
 
         #region snippet_GetAll
 
         [HttpGet]
         [ProducesResponseType(typeof(Station), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [Role(roles: new [] { Roles.SuperAdmin, Roles.StationAdmin })]
+        [Role(roles: new [] { Roles.SuperAdmin })]
         [SetPaginate]
         public async Task<IActionResult> GetAllAsync([FromQuery] Request request)
         {
             var totalDocuments = await _stationRepository.CountAsync(request);
             var stations = await _stationRepository.GetAllAsync(request);
-            return Ok(new { Status = true, Data = stations, Paginator = Paginator.Paginate(request, totalDocuments) });
+            return Ok(new
+                {
+                    Status = true,
+                    Data = stations,
+                    Paginator = Paginator.Paginate(request, totalDocuments)
+                });
         }
 
         #endregion
@@ -49,7 +62,7 @@ namespace Api.Web.Controllers
         [ProducesResponseType(typeof(Station), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [Role(roles: new [] { Roles.SuperAdmin, Roles.StationAdmin })]
+        [Role(roles: new [] { Roles.SuperAdmin })]
         [StationExists]
         public async Task<IActionResult> GetByIdAsync(string id)
         {
@@ -89,7 +102,7 @@ namespace Api.Web.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [Role(roles: new [] { Roles.SuperAdmin, Roles.StationAdmin })]
+        [Role(roles: new [] { Roles.SuperAdmin })]
         [StationExists]
         public async Task<IActionResult> UpdateByIdAsync(string id, [FromBody] JsonPatchDocument<Station> replaceStation)
         {

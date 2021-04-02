@@ -67,6 +67,7 @@ namespace Api.Web.Controllers
         #endregion
 
         #region snippet_GetToken
+
         private async Task<dynamic> GetToken(Credentials credentials)
         {
             var isValidCredentials = await ValidateCredentials(credentials);
@@ -89,6 +90,7 @@ namespace Api.Web.Controllers
         #endregion
 
         #region snippet_ValidateCredentials
+
         private async Task<bool> ValidateCredentials(Credentials credentials)
         {
             var user = await GetUserByEmail(credentials.Email);
@@ -105,6 +107,7 @@ namespace Api.Web.Controllers
         #endregion
 
         #region GetUserByEmail
+
         private async Task<dynamic> GetUserByEmail(string email)
         {
             var request = new Request { Filters = new [] { $"Email={email}" } };
