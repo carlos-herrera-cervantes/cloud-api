@@ -24,20 +24,34 @@ namespace Api.Web.Controllers
         private readonly IUserRepository _userRepository;
         private readonly IOperationHandler _operationHandler;
 
-        public UserController(IUserManager userManager, IUserRepository userRepository, IOperationHandler operationHandler)
-            => (_userManager, _userRepository, _operationHandler) = (userManager, userRepository, operationHandler);
+        public UserController(
+            IUserManager userManager,
+            IUserRepository userRepository,
+            IOperationHandler operationHandler
+        )
+        {
+            _userManager = userManager;
+            _userRepository = userRepository;
+            _operationHandler = operationHandler;
+        }
 
         #region snippet_GetAll
 
         [HttpGet]
         [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [Role(new[] { Roles.SuperAdmin })]
         [SetPaginate]
         public async Task<IActionResult> GetAllAsync([FromQuery] Request request)
         {
             var totalDocuments = await _userRepository.CountAsync(request);
             var users = await _userRepository.GetAllAsync(request);
-            return Ok(new { Status = true, Data = users, Paginator = Paginator.Paginate(request, totalDocuments) });
+            return Ok(new
+                {
+                    Status = true,
+                    Data = users,
+                    Paginator = Paginator.Paginate(request, totalDocuments)
+                });
         }
 
         #endregion
@@ -48,6 +62,7 @@ namespace Api.Web.Controllers
         [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [Role(new[] { Roles.SuperAdmin })]
         [UserExists]
         public async Task<IActionResult> GetByIdAsync(string id)
         {
@@ -88,6 +103,7 @@ namespace Api.Web.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [Role(new[] { Roles.SuperAdmin })]
         [UserExists]
         public async Task<IActionResult> UpdateByIdAsync(string id, [FromBody] JsonPatchDocument<User> replaceUser)
         {
@@ -113,6 +129,7 @@ namespace Api.Web.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [Role(new[] { Roles.SuperAdmin })]
         [UserExists]
         public async Task<IActionResult> DeleteByIdAsync(string id)
         {

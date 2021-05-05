@@ -15,10 +15,10 @@ namespace Api.Domain.Models
         [Required(ErrorMessage = "PurchaseFolioRequired")]
         public string Folio { get; set; }
 
-        [BsonElement("iva")]
-        [JsonProperty("iva")]
+        [BsonElement("vat")]
+        [JsonProperty("vat")]
         [Required(ErrorMessage = "PurchaseIvaRequired")]
-        public decimal? Iva { get; set; }
+        public decimal? Vat { get; set; }
 
         [BsonElement("subtotal")]
         [JsonProperty("subtotal")]
