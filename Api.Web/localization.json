@@ -299,5 +299,12 @@
       "es": "El producto no tiene unidad de medida.",
       "en": "The product does not have a unit of measure."
     }
+  },
+  {
+    "Key": "InvalidProductType",
+    "LocalizedValue": {
+      "es": "El tipo de producto no es válido (fuel|additive).",
+      "en": "The product type is not valid (fuel|additive)."
+    }
   }
 ]
