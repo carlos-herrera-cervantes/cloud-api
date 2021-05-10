@@ -1,3 +1,4 @@
+using Api.Domain.Constants;
 using System.ComponentModel.DataAnnotations;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
@@ -25,5 +26,10 @@ namespace Api.Domain.Models
         [JsonProperty("pricePublic")]
         [Required(ErrorMessage = "ProductPricePublicRequired")]
         public decimal PricePublic { get; set; }
+
+        [BsonElement("type")]
+        [JsonProperty("type")]
+        [RegularExpression("fuel|additive|undefined", ErrorMessage = "InvalidProductType")]
+        public string Type { get; set; } = ProductType.Undefined;
     }
 }
