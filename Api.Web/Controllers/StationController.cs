@@ -62,7 +62,7 @@ namespace Api.Web.Controllers
         [ProducesResponseType(typeof(Station), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [Role(roles: new [] { Roles.SuperAdmin })]
+        [Role(roles: new [] { Roles.SuperAdmin, Roles.StationAdmin })]
         [StationExists]
         public async Task<IActionResult> GetByIdAsync(string id)
         {
@@ -102,7 +102,7 @@ namespace Api.Web.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [Role(roles: new [] { Roles.SuperAdmin })]
+        [Role(roles: new [] { Roles.SuperAdmin, Roles.StationAdmin })]
         [StationExists]
         public async Task<IActionResult> UpdateByIdAsync(string id, [FromBody] JsonPatchDocument<Station> replaceStation)
         {

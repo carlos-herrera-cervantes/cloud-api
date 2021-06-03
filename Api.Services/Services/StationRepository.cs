@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Api.Domain.Models;
 using Api.Repository.Repositories;
+using MongoDB.Driver;
 
 namespace Api.Services.Services
 {
@@ -16,6 +17,8 @@ namespace Api.Services.Services
         public async Task<Station> GetByIdAsync(string id) => await _stationRepository.GetByIdAsync(id);
 
         public async Task<Station> GetOneAsync(Request request) => await _stationRepository.GetOneAsync(request);
+
+        public async Task<Station> GetOneAsync(FilterDefinition<Station> filter) => await _stationRepository.GetOneAsync(filter);
 
         public async Task<int> CountAsync(Request request) => await _stationRepository.CountAsync(request);
     }

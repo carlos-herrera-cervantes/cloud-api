@@ -68,6 +68,11 @@ namespace Api.Repository.Repositories
             return await _context.Find(filter).FirstOrDefaultAsync();
         }
 
+        /// <summary>Get one document asynchronous fashion</summary>
+        /// <param name="filter">Filter definition</param>
+        /// <returns>Mongo document</returns>
+        public async Task<T> GetOneAsync(FilterDefinition<T> filter) => await _context.Find(filter).FirstOrDefaultAsync();
+
         /// <summary>
         /// Counts the documents of a collection
         /// </summary>
@@ -80,5 +85,12 @@ namespace Api.Repository.Repositories
             var totalDocuments = await _context.CountDocumentsAsync(filter);
             return (int)totalDocuments;
         }
+
+        /// <summary>
+        /// Counts the documents of a collection
+        /// </summary>
+        /// <param name="filter">Filter definition</param>
+        /// <returns>Number of documents</returns>
+        public async Task<int> CountAsync(FilterDefinition<T> filter) => (int)await _context.CountDocumentsAsync(filter);
     }
 }

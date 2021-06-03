@@ -16,7 +16,11 @@ namespace Api.Web.Middlewares
             private readonly IPaymentMethodRepository _paymentMethodRepository;
             private readonly IStringLocalizer<SharedResources> _localizer;
 
-            public PaymentMethodExistsFilter(IPaymentMethodRepository paymentMethodRepository, IStringLocalizer<SharedResources> localizer)
+            public PaymentMethodExistsFilter
+            (
+                IPaymentMethodRepository paymentMethodRepository,
+                IStringLocalizer<SharedResources> localizer
+            )
                 => (_paymentMethodRepository, _localizer) = (paymentMethodRepository, localizer);
 
             #region snippet_BeforeExecute
@@ -28,8 +32,14 @@ namespace Api.Web.Middlewares
                     var id = context.ActionArguments["id"] as string;
                     var paymentMethod = await _paymentMethodRepository.GetByIdAsync(id);
 
-                    if (paymentMethod is null) {
-                        context.Result = new NotFoundObjectResult(new { Status = false, Message = _localizer["PaymentNotFound"].Value, Code = "PaymentNotFound" });
+                    if (paymentMethod is null)
+                    {
+                        context.Result = new NotFoundObjectResult(new
+                        {
+                            Status = false,
+                            Message = _localizer["PaymentNotFound"].Value,
+                            Code = "PaymentNotFound"
+                        });
                         return;
                     }
 
@@ -37,7 +47,12 @@ namespace Api.Web.Middlewares
                 }
                 catch (FormatException)
                 {
-                    context.Result = new BadRequestObjectResult(new { Status = false, Message = _localizer["InvalidObjectId"].Value, Code = "InvalidObjectId" });
+                    context.Result = new BadRequestObjectResult(new
+                    {
+                        Status = false,
+                        Message = _localizer["InvalidObjectId"].Value,
+                        Code = "InvalidObjectId"
+                    });
                     return;
                 }
             }

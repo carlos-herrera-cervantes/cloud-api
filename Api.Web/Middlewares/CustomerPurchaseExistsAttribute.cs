@@ -16,7 +16,11 @@ namespace Api.Web.Middlewares
             private readonly ICustomerPurchaseRepository _customerPurchaseRepository;
             private readonly IStringLocalizer<SharedResources> _localizer;
 
-            public CustomerPurchaseExistsFilter(ICustomerPurchaseRepository customerPurchaseRepository, IStringLocalizer<SharedResources> localizer)
+            public CustomerPurchaseExistsFilter
+            (
+                ICustomerPurchaseRepository customerPurchaseRepository,
+                IStringLocalizer<SharedResources> localizer
+            )
                 => (_customerPurchaseRepository, _localizer) = (customerPurchaseRepository, localizer);
             
             #region snippet_BeforeExecute
@@ -28,8 +32,14 @@ namespace Api.Web.Middlewares
                     var id = context.ActionArguments["id"] as string;
                     var purchase = await _customerPurchaseRepository.GetByIdAsync(id);
 
-                    if (purchase is null) {
-                        context.Result = new NotFoundObjectResult(new { Status = false, Message = _localizer["PurchaseNotFound"].Value, Code = "PurchaseNotFound" });
+                    if (purchase is null)
+                    {
+                        context.Result = new NotFoundObjectResult(new
+                        {
+                            Status = false,
+                            Message = _localizer["PurchaseNotFound"].Value,
+                            Code = "PurchaseNotFound"
+                        });
                         return ;
                     }
 
@@ -37,7 +47,12 @@ namespace Api.Web.Middlewares
                 }
                 catch (FormatException)
                 {
-                    context.Result = new BadRequestObjectResult(new { Status = false, Message = _localizer["InvalidObjectId"].Value, Code = "InvalidObjectId" });
+                    context.Result = new BadRequestObjectResult(new
+                    {
+                        Status = false,
+                        Message = _localizer["InvalidObjectId"].Value,
+                        Code = "InvalidObjectId"
+                    });
                     return;
                 }
             }

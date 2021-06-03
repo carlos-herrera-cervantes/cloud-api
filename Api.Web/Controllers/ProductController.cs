@@ -40,7 +40,7 @@ namespace Api.Web.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(Product), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [Role(roles: new [] { Roles.SuperAdmin, Roles.StationAdmin, Roles.Employee } )]
+        [Role(roles: new [] { Roles.All } )]
         [SetPaginate]
         public async Task<IActionResult> GetAllAsync([FromQuery] Request request)
         {
@@ -62,7 +62,7 @@ namespace Api.Web.Controllers
         [ProducesResponseType(typeof(Product), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [Role(roles: new [] { Roles.SuperAdmin, Roles.StationAdmin, Roles.Employee })]
+        [Role(roles: new [] { Roles.All })]
         [ProductExists]
         public async Task<IActionResult> GetByIdAsync(string id)
         {
@@ -78,7 +78,7 @@ namespace Api.Web.Controllers
         [ProducesResponseType(typeof(Product), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [Role(roles: new [] { Roles.SuperAdmin, Roles.StationAdmin, Roles.Employee })]
+        [Role(roles: new [] { Roles.SuperAdmin, Roles.StationAdmin })]
         public async Task<IActionResult> CreateAsync(Product product)
         {
             await _productManager.CreateAsync(product);
@@ -102,7 +102,7 @@ namespace Api.Web.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [Role(roles: new [] { Roles.SuperAdmin, Roles.StationAdmin, Roles.Employee })]
+        [Role(roles: new [] { Roles.SuperAdmin, Roles.StationAdmin })]
         [ProductExists]
         public async Task<IActionResult> UpdateByIdAsync(string id, [FromBody] JsonPatchDocument<Product> replaceProduct)
         {

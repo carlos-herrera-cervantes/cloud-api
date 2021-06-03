@@ -10,7 +10,8 @@ namespace Api.Web.Handlers
         private readonly Subject<CollectionEventReceived> _subject;
         private readonly Dictionary<string, IDisposable> _subscribers;
 
-        public OperationHandler() => (_subject, _subscribers) = (new Subject<CollectionEventReceived>(), new Dictionary<string, IDisposable>());
+        public OperationHandler()
+            => (_subject, _subscribers) = (new Subject<CollectionEventReceived>(), new Dictionary<string, IDisposable>());
 
         #region PublishMessage
 

@@ -3,7 +3,6 @@ using Api.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Localization;
-using System;
 
 namespace Api.Web.Middlewares
 {

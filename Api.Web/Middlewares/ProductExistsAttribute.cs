@@ -16,7 +16,11 @@ namespace Api.Web.Middlewares
             private readonly IProductRepository _productRepository;
             private readonly IStringLocalizer<SharedResources> _localizer;
 
-            public ProductExistsFilter(IProductRepository productRepository, IStringLocalizer<SharedResources> localizer)
+            public ProductExistsFilter
+            (
+                IProductRepository productRepository,
+                IStringLocalizer<SharedResources> localizer
+            )
                 => (_productRepository, _localizer) = (productRepository, localizer);
 
             public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -26,8 +30,14 @@ namespace Api.Web.Middlewares
                     var id = context.ActionArguments["id"] as string;
                     var product = await _productRepository.GetByIdAsync(id);
 
-                    if (product is null) {
-                        context.Result = new NotFoundObjectResult(new { Status = false, Message = _localizer["ProductNotFound"].Value, Code = "ProductNotFound" });
+                    if (product is null)
+                    {
+                        context.Result = new NotFoundObjectResult(new
+                        {
+                            Status = false,
+                            Message = _localizer["ProductNotFound"].Value,
+                            Code = "ProductNotFound"
+                        });
                         return;
                     }
 
@@ -35,7 +45,12 @@ namespace Api.Web.Middlewares
                     }
                 catch (FormatException)
                 {
-                    context.Result = new BadRequestObjectResult(new { Status = false, Message = _localizer["InvalidObjectId"].Value, Code = "InvalidObjectId" });
+                    context.Result = new BadRequestObjectResult(new
+                    {
+                        Status = false,
+                        Message = _localizer["InvalidObjectId"].Value,
+                        Code = "InvalidObjectId"
+                    });
                     return;
                 }
             }

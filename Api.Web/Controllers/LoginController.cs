@@ -1,21 +1,27 @@
 using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using Api.Domain.Constants;
 using Api.Domain.Models;
 using Api.Services.Services;
+using Api.Web.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Localization;
 using Microsoft.IdentityModel.Tokens;
+using MongoDB.Driver;
 
 namespace Api.Web.Controllers
 {
     [Authorize]
     [Route("api/v1/auth")]
+    [Produces("application/json")]
     [ApiController]
     public class LoginController : ControllerBase
     {
@@ -30,20 +36,34 @@ namespace Api.Web.Controllers
             ITokenManager tokenManager,
             IStringLocalizer<SharedResources> localizer
         )
-        => (_userRepository, _configuration, _tokenManager, _localizer) = (userRepository, configuration, tokenManager, localizer);
+        {
+            _userRepository = userRepository;
+            _configuration = configuration;
+            _tokenManager = tokenManager;
+            _localizer = localizer;
+        }
 
-        #region snippet_Login
+        #region snippet_ActionMethods
 
         [AllowAnonymous]
         [HttpPost("login")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Login(Credentials credentials)
         {
-            var token = await GetToken(credentials);
-
-            if (token is false) return NotFound(new { Status = false, Code = "InvalidCredentials", Message = _localizer["InvalidCredentials"].Value });
-
             var user = await GetUserByEmail(credentials.Email);
+            await DeleteSepecificTokens(user.Id);
+
+            var token = await GetToken(credentials, user);
+
+            if (token is false || user.Role == Roles.Employee) return NotFound(new
+                { 
+                    Status = false,
+                    Code = "InvalidCredentials",
+                    Message = _localizer["InvalidCredentials"].Value
+                });
+
             var accessToken = new AccessToken
             {
                 Token = token,
@@ -56,29 +76,54 @@ namespace Api.Web.Controllers
             return Ok(new { Status = true, Data = token });
         }
 
-        #endregion
-
-        #region snippet_Logout
-
         [HttpPost("logout")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<IActionResult> Logout() => await Task.FromResult(NoContent());
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> Logout()
+        {
+            var token = HttpContext.Request.Headers.ExtractJsonWebToken();
+            var handler = new JwtSecurityTokenHandler();
+            var decoded = handler.ReadJwtToken(token);
+            var id = ((List<Claim>)decoded.Claims)?
+                .Where(claim => claim.Type == "nameid")
+                .Select(claim => claim.Value)
+                .SingleOrDefault();
+
+            await DeleteSepecificTokens(id);
+            return NoContent();
+        }
 
         #endregion
 
-        #region snippet_GetToken
+        #region snippet_Helpers
 
-        private async Task<dynamic> GetToken(Credentials credentials)
+        /// <summary>
+        /// Returns the Json Web Token
+        /// </summary>
+        /// <param name="credentials">User email and password</param>
+        /// <param name="user">User model</param>
+        /// <returns>Json Web Token</returns>
+        private async Task<dynamic> GetToken(Credentials credentials, User user)
         {
             var isValidCredentials = await ValidateCredentials(credentials);
             
             if (isValidCredentials is false) return false;
 
-            var claims = new ClaimsIdentity(new[] { new Claim(ClaimTypes.Email, credentials.Email) });
+            var claims = new ClaimsIdentity(new[]
+                { 
+                    new Claim(ClaimTypes.Email, credentials.Email),
+                    new Claim(ClaimTypes.Role, user.Role),
+                    new Claim(ClaimTypes.NameIdentifier, user.Id),
+                    new Claim("station", user.StationId)
+                });
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = claims,
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_configuration.GetValue<string>("SecretKey"))), SecurityAlgorithms.HmacSha256Signature),
+                SigningCredentials = new SigningCredentials(
+                    new SymmetricSecurityKey(
+                        Encoding.ASCII.GetBytes(_configuration.GetValue<string>("SecretKey"))),
+                        SecurityAlgorithms.HmacSha256Signature
+                    ),
                 Expires = DateTime.UtcNow.AddDays(5)
             };
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -87,10 +132,11 @@ namespace Api.Web.Controllers
             return tokenHandler.WriteToken(createdToken);
         }
 
-        #endregion
-
-        #region snippet_ValidateCredentials
-
+        /// <summary>
+        /// Check if the entered credentials are valid
+        /// </summary>
+        /// <param name="credentials">User email and password</param>
+        /// <returns>If they are valid returns true</returns>
         private async Task<bool> ValidateCredentials(Credentials credentials)
         {
             var user = await GetUserByEmail(credentials.Email);
@@ -104,17 +150,25 @@ namespace Api.Web.Controllers
             return false;
         }
 
-        #endregion
-
-        #region GetUserByEmail
-
+        /// <summary>
+        /// Returns user model
+        /// </summary>
+        /// <param name="email">User email</param>
+        /// <returns>User model</returns>
         private async Task<dynamic> GetUserByEmail(string email)
         {
-            var request = new Request { Filters = new [] { $"Email={email}" } };
-            var user = await _userRepository.GetOneAsync(request);
+            var user = await _userRepository.GetOneAsync(Builders<User>.Filter.Where(u => u.Email == email));
             if (user is null) return false;
             return user;
         }
+
+        /// <summary>
+        /// Deletes a set of tokens that belongs to the user in session
+        /// </summary>
+        /// <param name="id">User ID</param>
+        /// <returns></returns>
+        private async Task DeleteSepecificTokens(string id)
+            => await _tokenManager.DeleteManyAsync(Builders<AccessToken>.Filter.Where(t => t.UserId == id));
 
         #endregion
     }
