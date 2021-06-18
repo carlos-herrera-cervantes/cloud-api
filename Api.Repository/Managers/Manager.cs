@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Api.Domain.Models;
 using Api.Infrastructure.Contexts;
+using Api.Repository.Extensions;
 using Microsoft.AspNetCore.JsonPatch;
 using MongoDB.Driver;
 
@@ -26,5 +27,15 @@ namespace Api.Repository.Managers
         }
 
         public async Task DeleteByIdAsync(string id) => await _context.DeleteOneAsync(entity => entity.Id == id);
+
+        public async Task<DeleteResult> DeleteManyAsync(Request request)
+        {
+            var (_, filters) = request;
+            var filter = MongoDBDefinitions.BuildFilter<T>(filters);
+
+            return await _context.DeleteManyAsync(filter);
+        }
+
+        public async Task<DeleteResult> DeleteManyAsync(FilterDefinition<T> filter) => await _context.DeleteManyAsync(filter);
     }
 }

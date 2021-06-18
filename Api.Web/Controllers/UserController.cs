@@ -1,8 +1,13 @@
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Api.Domain.Constants;
 using Api.Domain.Models;
 using Api.Services.Services;
 using Api.Web.Common;
+using Api.Web.Extensions;
 using Api.Web.Handlers;
 using Api.Web.Middlewares;
 using Api.Web.Models;
@@ -35,7 +40,7 @@ namespace Api.Web.Controllers
             _operationHandler = operationHandler;
         }
 
-        #region snippet_GetAll
+        #region snippet_Get
 
         [HttpGet]
         [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
@@ -47,22 +52,69 @@ namespace Api.Web.Controllers
             var totalDocuments = await _userRepository.CountAsync(request);
             var users = await _userRepository.GetAllAsync(request);
             return Ok(new
-                {
-                    Status = true,
-                    Data = users,
-                    Paginator = Paginator.Paginate(request, totalDocuments)
-                });
+            {
+                Status = true,
+                Data = users,
+                Paginator = Paginator.Paginate(request, totalDocuments)
+            });
         }
 
-        #endregion
+        [HttpGet("station")]
+        [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [Role(new[] { Roles.SuperAdmin, Roles.StationAdmin })]
+        [SetPaginate]
+        public async Task<IActionResult> GetByStation([FromQuery] Request request)
+        {
+            var token = HttpContext.Request.Headers.ExtractJsonWebToken();
+            var handler = new JwtSecurityTokenHandler();
+            var decoded = handler.ReadJwtToken(token);
 
-        #region snippet_GetById
+            string station = ((List<Claim>)decoded.Claims)?
+                .Where(claim => claim.Type == "station")
+                .Select(claim => claim.Value)
+                .SingleOrDefault();
+
+            request.Filters = string.IsNullOrEmpty(request.Filters)?
+                $"stationId={station}" :
+                request.Filters + $",stationId={station}";
+
+            var totalDocuments = await _userRepository.CountAsync(request);
+            var users = await _userRepository.GetAllAsync(request);
+
+            return Ok(new
+            {
+                Status = true,
+                Data = users,
+                Paginator = Paginator.Paginate(request, totalDocuments)
+            });
+        }
+
+        [HttpGet("me")]
+        [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [Role(new[] { Roles.SuperAdmin, Roles.StationAdmin })]
+        public async Task<IActionResult> GetMeAsync()
+        {
+            var token = HttpContext.Request.Headers.ExtractJsonWebToken();
+            var handler = new JwtSecurityTokenHandler();
+            var decoded = handler.ReadJwtToken(token);
+
+            string sub = ((List<Claim>)decoded.Claims)?
+                .Where(claim => claim.Type == "nameid")
+                .Select(claim => claim.Value)
+                .SingleOrDefault();
+
+            var user = await _userRepository.GetByIdAsync(sub);
+
+            return Ok(new { Status = true, Data = user });
+        }
 
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [Role(new[] { Roles.SuperAdmin })]
+        [Role(new[] { Roles.SuperAdmin, Roles.StationAdmin })]
         [UserExists]
         public async Task<IActionResult> GetByIdAsync(string id)
         {
@@ -72,7 +124,7 @@ namespace Api.Web.Controllers
 
         #endregion
 
-        #region snippet_Create
+        #region snippet_Post
 
         [AllowAnonymous]
         [HttpPost]
@@ -96,14 +148,14 @@ namespace Api.Web.Controllers
 
         #endregion
 
-        #region snippet_UpdatePartial
+        #region snippet_Patch
 
         [HttpPatch("{id}")]
         [ProducesResponseType(typeof(User), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [Role(new[] { Roles.SuperAdmin })]
+        [Role(new[] { Roles.SuperAdmin, Roles.StationAdmin })]
         [UserExists]
         public async Task<IActionResult> UpdateByIdAsync(string id, [FromBody] JsonPatchDocument<User> replaceUser)
         {
@@ -129,7 +181,7 @@ namespace Api.Web.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [Role(new[] { Roles.SuperAdmin })]
+        [Role(new[] { Roles.SuperAdmin, Roles.StationAdmin })]
         [UserExists]
         public async Task<IActionResult> DeleteByIdAsync(string id)
         {

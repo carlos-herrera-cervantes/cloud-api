@@ -7,5 +7,7 @@
         public const string StationAdmin = "StationAdmin";
 
         public const string SuperAdmin = "SuperAdmin";
+
+        public const string All = "All";
     }
 }

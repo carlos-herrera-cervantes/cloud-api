@@ -306,5 +306,19 @@
       "es": "El tipo de producto no es válido (fuel|additive).",
       "en": "The product type is not valid (fuel|additive)."
     }
+  },
+  {
+    "Key": "ExpiredToken",
+    "LocalizedValue": {
+      "es": "El token ha expirado",
+      "en": "Expired token."
+    }
+  },
+  {
+    "Key": "InvalidOperation",
+    "LocalizedValue": {
+      "es": "La operación es inválida.",
+      "en": "The operation is invalid."
+    }
   }
 ]

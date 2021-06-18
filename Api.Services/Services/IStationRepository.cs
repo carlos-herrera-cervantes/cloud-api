@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Api.Domain.Models;
+using MongoDB.Driver;
 
 namespace Api.Services.Services
 {
@@ -11,6 +12,8 @@ namespace Api.Services.Services
         Task<Station> GetByIdAsync(string id);
 
         Task<Station> GetOneAsync(Request request);
+
+        Task<Station> GetOneAsync(FilterDefinition<Station> filter);
 
         Task<int> CountAsync(Request request);
     }

@@ -43,13 +43,13 @@ namespace Api.Domain.Models
         public string[] Entities { get; set; } = new string[0];
 
         [FromQuery(Name = "filter")]
-        public string[] Filters { get; set; } =  new string[0];
+        public string Filters { get; set; } = null;
 
         #endregion
 
         #region snippet_Deconstruct
 
-        public void Deconstruct(out string sort, out int pageSize, out int page, out string[] entities, out string[] filters)
+        public void Deconstruct(out string sort, out int pageSize, out int page, out string[] entities, out string filters)
         {
             sort = Sort;
             pageSize = PageSize;
@@ -58,7 +58,7 @@ namespace Api.Domain.Models
             filters = Filters;
         }
 
-        public void Deconstruct(out string sort, out string[] filters) => (sort, filters) = (Sort, Filters);
+        public void Deconstruct(out string sort, out string filters) => (sort, filters) = (Sort, Filters);
 
         #endregion
     }

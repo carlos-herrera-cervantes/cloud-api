@@ -15,9 +15,9 @@ namespace Api.Repository.Extensions
         /// <summary>Build a filter for MongoDB driver</summary>
         /// <param name="request">The type Request object</params>
         /// <returns>A filter definition</returns>
-        public static FilterDefinition<T> BuildFilter<T>(string[] filters) where T : BaseEntity
+        public static FilterDefinition<T> BuildFilter<T>(string filters) where T : BaseEntity
         {
-            if (filters.IsEmpty()) return Builders<T>.Filter.Empty;
+            if (String.IsNullOrEmpty(filters)) return Builders<T>.Filter.Empty;
             var lambda = GenerateFilter<T>(filters);
             return Builders<T>.Filter.Where(lambda);
         }
@@ -67,10 +67,9 @@ namespace Api.Repository.Extensions
         /// <summary>Generate the filter using lambda expression</summary>
         /// <param name="keys">The query string sended in the http request</param>
         /// <returns>Lambda expression builded</returns>
-        private static Expression<Func<T, bool>> GenerateFilter<T>(string[] keys) where T : BaseEntity
+        private static Expression<Func<T, bool>> GenerateFilter<T>(string keys) where T : BaseEntity
         {
-            var firstElement = keys.First();
-            var keyValues = firstElement.Split(',');
+            var keyValues = keys.Split(',');
             var operators = keyValues.Select(key => key.ClassifyOperation());
             var parameterExpression = Expression.Parameter(typeof(T), "entity");
             var lambda = BuildExpression<T>(parameterExpression, operators);
@@ -94,7 +93,12 @@ namespace Api.Repository.Extensions
                 counter++;
             }
 
-            var lambda = Expression.Lambda<Func<T, bool>>(operations.First().Value, expression);
+            var accumulated = operators.Count() == 2 ?
+                Expression.And(operations.First().Value, operations.Last().Value) :
+                operations.First().Value;
+
+            var lambda = Expression.Lambda<Func<T, bool>>(accumulated, expression);
+
             return lambda;
         }
 
