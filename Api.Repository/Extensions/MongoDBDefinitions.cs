@@ -45,12 +45,13 @@ namespace Api.Repository.Extensions
             FilterDefinition<T> filter,
             SortDefinition<BsonDocument> sortFilter,
             List<Relation> relations,
-            Request request
+            ListResourceRequest request
         ) where T : BaseEntity
         {
             var (_, pageSize, page, entities, _) = request;
             var textInfo = CultureInfo.CurrentCulture.TextInfo;
-            var entity = textInfo.ToTitleCase(entities.First());
+            var splitedEntities = entities.Split(',');
+            var entity = textInfo.ToTitleCase(splitedEntities.First());
             var (localKey, foreignKey, justOne) = relations.Find(r => r.Entity == entity);
 
             var pipe = collection

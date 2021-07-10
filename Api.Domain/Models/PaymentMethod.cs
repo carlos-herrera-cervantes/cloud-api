@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
@@ -24,5 +25,17 @@ namespace Api.Domain.Models
         [BsonElement("status")]
         [JsonProperty("status")]
         public bool Status { get; set; } = true;
+    }
+
+    public class SinglePaymentMethodResponse : BaseResponse
+    {
+        [JsonProperty("data")]
+        public PaymentMethod Data { get; set; }
+    }
+
+    public class ListPaymentMethodResponse : ListBaseResponse
+    {
+        [JsonProperty("data")]
+        public List<PaymentMethod> Data { get; set; }
     }
 }

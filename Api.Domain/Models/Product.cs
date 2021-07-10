@@ -2,6 +2,7 @@ using Api.Domain.Constants;
 using System.ComponentModel.DataAnnotations;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace Api.Domain.Models
 {
@@ -31,5 +32,17 @@ namespace Api.Domain.Models
         [JsonProperty("type")]
         [RegularExpression("fuel|additive|undefined", ErrorMessage = "InvalidProductType")]
         public string Type { get; set; } = ProductType.Undefined;
+    }
+
+    public class SingleProductResponse : BaseResponse
+    {
+        [JsonProperty("data")]
+        public Product Data { get; set; }
+    }
+
+    public class ListProductResponse : ListBaseResponse
+    {
+        [JsonProperty("data")]
+        public List<Product> Data { get; set; }
     }
 }

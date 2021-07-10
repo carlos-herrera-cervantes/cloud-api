@@ -16,7 +16,7 @@
         /// <param name="request">Request object model</param>
         /// <param name="totalDocuments">Total documents of a collection</param>
         /// <returns>Paginator object model</returns>
-        public static Paginator Paginate(Request request, int totalDocuments)
+        public static Paginator Paginate(ListResourceRequest request, int totalDocuments)
         {
             var (_, pageSize, page, _, _) = request;
             var clonePage = page < 1 ? 1 : page;

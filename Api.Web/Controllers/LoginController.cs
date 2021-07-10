@@ -21,6 +21,7 @@ namespace Api.Web.Controllers
 {
     [Authorize]
     [Route("api/v1/auth")]
+    [Consumes("application/json")]
     [Produces("application/json")]
     [ApiController]
     public class LoginController : ControllerBase
@@ -30,7 +31,8 @@ namespace Api.Web.Controllers
         private readonly ITokenManager _tokenManager;
         private readonly IStringLocalizer<SharedResources> _localizer;
 
-        public LoginController(
+        public LoginController
+        (
             IUserRepository userRepository, 
             IConfiguration configuration, 
             ITokenManager tokenManager,
@@ -47,10 +49,10 @@ namespace Api.Web.Controllers
 
         [AllowAnonymous]
         [HttpPost("login")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessAuth))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Login(Credentials credentials)
+        public async Task<IActionResult> Login([FromBody] Credentials credentials)
         {
             var user = await GetUserByEmail(credentials.Email);
             await DeleteSepecificTokens(user.Id);
@@ -78,6 +80,7 @@ namespace Api.Web.Controllers
 
         [HttpPost("logout")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Logout()
         {

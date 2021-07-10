@@ -28,7 +28,7 @@ namespace Api.Repository.Managers
 
         public async Task DeleteByIdAsync(string id) => await _context.DeleteOneAsync(entity => entity.Id == id);
 
-        public async Task<DeleteResult> DeleteManyAsync(Request request)
+        public async Task<DeleteResult> DeleteManyAsync(ListResourceRequest request)
         {
             var (_, filters) = request;
             var filter = MongoDBDefinitions.BuildFilter<T>(filters);

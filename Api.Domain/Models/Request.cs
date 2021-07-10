@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Domain.Models
 {
-    public class Request
+    public class ListResourceRequest
     {
         #region snippet_PrivateProperties
 
@@ -40,7 +40,7 @@ namespace Api.Domain.Models
         public int Page { get; set; } = 0;
 
         [FromQuery(Name = "relation")]
-        public string[] Entities { get; set; } = new string[0];
+        public string Entities { get; set; } = null;
 
         [FromQuery(Name = "filter")]
         public string Filters { get; set; } = null;
@@ -49,7 +49,7 @@ namespace Api.Domain.Models
 
         #region snippet_Deconstruct
 
-        public void Deconstruct(out string sort, out int pageSize, out int page, out string[] entities, out string filters)
+        public void Deconstruct(out string sort, out int pageSize, out int page, out string entities, out string filters)
         {
             sort = Sort;
             pageSize = PageSize;
@@ -61,5 +61,11 @@ namespace Api.Domain.Models
         public void Deconstruct(out string sort, out string filters) => (sort, filters) = (Sort, Filters);
 
         #endregion
+    }
+
+    public class SingleResourceRequest
+    {
+        [FromQuery(Name = "relation")]
+        public string Entities { get; set; } = null;
     }
 }

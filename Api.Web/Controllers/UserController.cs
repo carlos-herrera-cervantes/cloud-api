@@ -20,6 +20,7 @@ namespace Api.Web.Controllers
 {
     [Authorize]
     [Route("api/v1/users")]
+    [Consumes("application/json")]
     [Produces("application/json")]
     [ApiController]
     public class UserController : ControllerBase
@@ -29,7 +30,8 @@ namespace Api.Web.Controllers
         private readonly IUserRepository _userRepository;
         private readonly IOperationHandler _operationHandler;
 
-        public UserController(
+        public UserController
+        (
             IUserManager userManager,
             IUserRepository userRepository,
             IOperationHandler operationHandler
@@ -43,11 +45,12 @@ namespace Api.Web.Controllers
         #region snippet_Get
 
         [HttpGet]
-        [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ListUserResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Role(new[] { Roles.SuperAdmin })]
         [SetPaginate]
-        public async Task<IActionResult> GetAllAsync([FromQuery] Request request)
+        public async Task<IActionResult> GetAllAsync([FromQuery] ListResourceRequest request)
         {
             var totalDocuments = await _userRepository.CountAsync(request);
             var users = await _userRepository.GetAllAsync(request);
@@ -60,11 +63,12 @@ namespace Api.Web.Controllers
         }
 
         [HttpGet("station")]
-        [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ListUserResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Role(new[] { Roles.SuperAdmin, Roles.StationAdmin })]
         [SetPaginate]
-        public async Task<IActionResult> GetByStation([FromQuery] Request request)
+        public async Task<IActionResult> GetByStation([FromQuery] ListResourceRequest request)
         {
             var token = HttpContext.Request.Headers.ExtractJsonWebToken();
             var handler = new JwtSecurityTokenHandler();
@@ -91,7 +95,8 @@ namespace Api.Web.Controllers
         }
 
         [HttpGet("me")]
-        [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(SingleUserResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Role(new[] { Roles.SuperAdmin, Roles.StationAdmin })]
         public async Task<IActionResult> GetMeAsync()
@@ -111,7 +116,8 @@ namespace Api.Web.Controllers
         }
 
         [HttpGet("{id}")]
-        [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(SingleUserResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Role(new[] { Roles.SuperAdmin, Roles.StationAdmin })]
@@ -128,7 +134,7 @@ namespace Api.Web.Controllers
 
         [AllowAnonymous]
         [HttpPost]
-        [ProducesResponseType(typeof(User), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(SingleUserResponse), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CreateAsync(User user)
@@ -151,7 +157,8 @@ namespace Api.Web.Controllers
         #region snippet_Patch
 
         [HttpPatch("{id}")]
-        [ProducesResponseType(typeof(User), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(SingleUserResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -179,6 +186,7 @@ namespace Api.Web.Controllers
 
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Role(new[] { Roles.SuperAdmin, Roles.StationAdmin })]

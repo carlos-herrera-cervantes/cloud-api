@@ -15,6 +15,7 @@ namespace Api.Web.Controllers
 {
     [Authorize]
     [Route("api/v1/payment-methods")]
+    [Consumes("application/json")]
     [Produces("application/json")]
     [ApiController]
     public class PaymentMethodController : ControllerBase
@@ -34,11 +35,12 @@ namespace Api.Web.Controllers
         #region snippet_GetAll
 
         [HttpGet]
-        [ProducesResponseType(typeof(PaymentMethod), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ListPaymentMethodResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Role(roles: new [] { Roles.SuperAdmin, Roles.StationAdmin })]
         [SetPaginate]
-        public async Task<IActionResult> GetAllAsync([FromQuery] Request request)
+        public async Task<IActionResult> GetAllAsync([FromQuery] ListResourceRequest request)
         {
             var totalDocuments = await _paymentMethodRepository.CountAsync(request);
             var paymentMethods = await _paymentMethodRepository.GetAllAsync(request);
@@ -50,7 +52,8 @@ namespace Api.Web.Controllers
         #region snippet_GetById
 
         [HttpGet("{id}")]
-        [ProducesResponseType(typeof(PaymentMethod), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(SinglePaymentMethodResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Role(roles: new [] { Roles.SuperAdmin, Roles.StationAdmin })]
@@ -66,7 +69,8 @@ namespace Api.Web.Controllers
         #region snipppet_Create
 
         [HttpPost]
-        [ProducesResponseType(typeof(PaymentMethod), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(SinglePaymentMethodResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Role(roles: new [] { Roles.SuperAdmin, Roles.StationAdmin })]
@@ -89,7 +93,8 @@ namespace Api.Web.Controllers
         #region snippet_UpdatePartial
 
         [HttpPatch("{id}")]
-        [ProducesResponseType(typeof(PaymentMethod), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(SinglePaymentMethodResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -116,6 +121,7 @@ namespace Api.Web.Controllers
 
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Role(roles: new [] { Roles.SuperAdmin, Roles.StationAdmin })]

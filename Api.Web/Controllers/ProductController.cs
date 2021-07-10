@@ -15,6 +15,7 @@ namespace Api.Web.Controllers
 {
     [Authorize]
     [Route("api/v1/products")]
+    [Consumes("application/json")]
     [Produces("application/json")]
     [ApiController]
     public class ProductController : ControllerBase
@@ -24,7 +25,8 @@ namespace Api.Web.Controllers
         private readonly IProductRepository _productRepository;
         private readonly IOperationHandler _operationHandler;
 
-        public ProductController(
+        public ProductController
+        (
             IProductManager productManager,
             IProductRepository productRepository,
             IOperationHandler operationHandler
@@ -38,11 +40,12 @@ namespace Api.Web.Controllers
         #region snippet_GetAll
 
         [HttpGet]
-        [ProducesResponseType(typeof(Product), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ListProductResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Role(roles: new [] { Roles.All } )]
         [SetPaginate]
-        public async Task<IActionResult> GetAllAsync([FromQuery] Request request)
+        public async Task<IActionResult> GetAllAsync([FromQuery] ListResourceRequest request)
         {
             var totalDocuments = await _productRepository.CountAsync(request);
             var products = await _productRepository.GetAllAsync(request);
@@ -59,7 +62,8 @@ namespace Api.Web.Controllers
         #region snippet_GetById
 
         [HttpGet("{id}")]
-        [ProducesResponseType(typeof(Product), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(SingleProductResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Role(roles: new [] { Roles.All })]
@@ -75,7 +79,8 @@ namespace Api.Web.Controllers
         #region snippet_Create
         
         [HttpPost]
-        [ProducesResponseType(typeof(Product), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(SingleProductResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Role(roles: new [] { Roles.SuperAdmin, Roles.StationAdmin })]
@@ -98,7 +103,8 @@ namespace Api.Web.Controllers
         #region snippet_UpdatePartial
 
         [HttpPatch("{id}")]
-        [ProducesResponseType(typeof(Product), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(SingleProductResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -125,6 +131,7 @@ namespace Api.Web.Controllers
 
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Role(roles: new [] { Roles.SuperAdmin, Roles.StationAdmin })]

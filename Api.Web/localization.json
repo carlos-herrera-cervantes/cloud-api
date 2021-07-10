@@ -320,5 +320,12 @@
       "es": "La operación es inválida.",
       "en": "The operation is invalid."
     }
+  },
+  {
+    "Key": "InvalidRole",
+    "LocalizedValue": {
+      "es": "El rol es inválido.",
+      "en": "The role is invalid."
+    }
   }
 ]

@@ -6,12 +6,12 @@ namespace Api.Services.Services
 {
     public interface IProductRepository
     {
-        Task<IEnumerable<Product>> GetAllAsync(Request request);
+        Task<IEnumerable<Product>> GetAllAsync(ListResourceRequest request);
 
         Task<Product> GetByIdAsync(string id);
 
-        Task<Product> GetOneAsync(Request request);
+        Task<Product> GetOneAsync(ListResourceRequest request);
 
-        Task<int> CountAsync(Request request);
+        Task<int> CountAsync(ListResourceRequest request);
     }
 }

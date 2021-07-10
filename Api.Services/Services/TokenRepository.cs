@@ -11,8 +11,6 @@ namespace Api.Services.Services
 
         public TokenRepository(IRepository<AccessToken> tokenRepository) => _tokenRepository = tokenRepository;
 
-        public async Task<AccessToken> GetOneAsync(Request request) => await _tokenRepository.GetOneAsync(request);
-
         public async Task<AccessToken> GetOneAsync(FilterDefinition<AccessToken> filter) => await _tokenRepository.GetOneAsync(filter);
     }
 }

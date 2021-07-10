@@ -8,7 +8,7 @@ namespace Api.Services.Services
     {
          Task CreateAsync(AccessToken token);
 
-         Task<DeleteResult> DeleteManyAsync(Request request);
+         Task<DeleteResult> DeleteManyAsync(ListResourceRequest request);
 
          Task<DeleteResult> DeleteManyAsync(FilterDefinition<AccessToken> filter);
     }
