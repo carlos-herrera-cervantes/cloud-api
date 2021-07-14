@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Api.Domain.Constants;
 using MongoDB.Bson;
@@ -32,11 +33,24 @@ namespace Api.Domain.Models
 
         [BsonElement("role")]
         [JsonProperty("role")]
+        [RegularExpression("Employee|StationAdmin|SuperAdmin", ErrorMessage = "InvalidRole")]
         public string Role { get; set; } = Roles.Employee;
 
         [BsonElement("stationId")]
         [JsonProperty("stationId")]
         [BsonRepresentation(BsonType.ObjectId)]
         public string StationId { get; set; }
+    }
+
+    public class SingleUserResponse : BaseResponse
+    {
+        [JsonProperty("data")]
+        public User Data { get; set; }
+    }
+
+    public class ListUserResponse : ListBaseResponse
+    {
+        [JsonProperty("data")]
+        public List<User> Data { get; set; }
     }
 }

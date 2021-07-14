@@ -6,12 +6,12 @@ namespace Api.Services.Services
 {
     public interface IPaymentMethodRepository
     {
-        Task<IEnumerable<PaymentMethod>> GetAllAsync(Request request);
+        Task<IEnumerable<PaymentMethod>> GetAllAsync(ListResourceRequest request);
 
         Task<PaymentMethod> GetByIdAsync(string id);
 
-        Task<PaymentMethod> GetOneAsync(Request request);
+        Task<PaymentMethod> GetOneAsync(ListResourceRequest request);
 
-        Task<int> CountAsync(Request request);
+        Task<int> CountAsync(ListResourceRequest request);
     }
 }

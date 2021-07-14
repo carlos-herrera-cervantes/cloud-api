@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Newtonsoft.Json;
 
 namespace Api.Domain.Models
 {
@@ -10,5 +11,11 @@ namespace Api.Domain.Models
 
         [Required(ErrorMessage = "PasswordRequired")]
         public string Password { get; set; }
+    }
+
+    public class SuccessAuth : BaseResponse
+    {
+        [JsonProperty("data")]
+        public string Data { get; set; }
     }
 }

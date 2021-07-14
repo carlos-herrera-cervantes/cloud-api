@@ -21,7 +21,7 @@ namespace Api.Web.Middlewares
 
             public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
             {
-                var clonedRequest = context.ActionArguments["request"] as Request;
+                var clonedRequest = context.ActionArguments["request"] as ListResourceRequest;
 
                 clonedRequest.Page = clonedRequest.Page > 0 ? clonedRequest.Page - 1 : clonedRequest.Page;
                 clonedRequest.PageSize = clonedRequest.PageSize < 1 ? 10 : clonedRequest.PageSize;

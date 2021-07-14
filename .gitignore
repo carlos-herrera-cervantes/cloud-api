@@ -7,6 +7,7 @@ Api.Services/bin/
 Api.Services/obj/
 Api.Web/bin/
 Api.Web/obj/
+Api.Web/appsettings.*
 Api.Repository/obj/
 Api.Repository/bin/
 .vscode

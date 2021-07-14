@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
 
@@ -47,5 +48,17 @@ namespace Api.Domain.Models
         [JsonProperty("municipality")]
         [Required(ErrorMessage = "StationMunicipality")]
         public string Municipality { get; set; }
+    }
+
+    public class SingleStationResponse : BaseResponse
+    {
+        [JsonProperty("data")]
+        public Station Data { get; set; }
+    }
+
+    public class ListStationResponse : ListBaseResponse
+    {
+        [JsonProperty("data")]
+        public List<Station> Data { get; set; }
     }
 }

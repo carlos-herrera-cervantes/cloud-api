@@ -13,7 +13,7 @@ namespace Api.Repository.Managers
 
         Task DeleteByIdAsync(string id);
 
-        Task<DeleteResult> DeleteManyAsync(Request request);
+        Task<DeleteResult> DeleteManyAsync(ListResourceRequest request);
 
         Task<DeleteResult> DeleteManyAsync(FilterDefinition<T> filter);
     }

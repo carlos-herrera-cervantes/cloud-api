@@ -16,6 +16,7 @@ namespace Api.Web.Controllers
 {
     [Authorize]
     [Route("api/v1/customer-purchases")]
+    [Consumes("application/json")]
     [Produces("application/json")]
     [ApiController]
     public class CustomerPurchaseController : ControllerBase
@@ -28,11 +29,12 @@ namespace Api.Web.Controllers
         #region snippet_Get
 
         [HttpGet]
-        [ProducesResponseType(typeof(CustomerPurchase), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ListCustomerPurchaseResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Role(roles: new [] { Roles.SuperAdmin })]
         [SetPaginate]
-        public async Task<IActionResult> GetAllAsync([FromQuery] Request request)
+        public async Task<IActionResult> GetAllAsync([FromQuery] ListResourceRequest request)
         {
             var totalDocuments = await _customerPurchaseRepository.CountAsync(request);
             var purchases = await _customerPurchaseRepository.GetAllAsync(request);
@@ -45,11 +47,12 @@ namespace Api.Web.Controllers
         }
 
         [HttpGet("me")]
-        [ProducesResponseType(typeof(CustomerPurchase), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ListCustomerPurchaseResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Role(roles: new [] { Roles.SuperAdmin, Roles.StationAdmin })]
         [SetPaginate]
-        public async Task<IActionResult> GetMeAsync([FromQuery] Request request)
+        public async Task<IActionResult> GetMeAsync([FromQuery] ListResourceRequest request)
         {
             var token = HttpContext.Request.Headers.ExtractJsonWebToken();
             var handler = new JwtSecurityTokenHandler();
@@ -76,12 +79,13 @@ namespace Api.Web.Controllers
         }
 
         [HttpGet("{id}")]
-        [ProducesResponseType(typeof(CustomerPurchase), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(SingleCustomerPurchaseResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Role(roles: new [] { Roles.SuperAdmin, Roles.StationAdmin })]
         [CustomerPurchaseExists]
-        public async Task<IActionResult> GetByIdAsync(string id)
+        public async Task<IActionResult> GetByIdAsync(string id, [FromQuery] SingleResourceRequest request)
         {
             var purchase = await _customerPurchaseRepository.GetByIdAsync(id);
             return Ok(new { Status = true, Data = purchase});

@@ -90,4 +90,16 @@ namespace Api.Domain.Models
 
         #endregion
     }
+
+    public class SingleCustomerPurchaseResponse : BaseResponse
+    {
+        [JsonProperty("data")]
+        public CustomerPurchase Data { get; set; }
+    }
+
+    public class ListCustomerPurchaseResponse : ListBaseResponse
+    {
+        [JsonProperty("data")]
+        public List<CustomerPurchase> Data { get; set; }
+    }
 }

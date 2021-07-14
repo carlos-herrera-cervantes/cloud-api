@@ -13,7 +13,7 @@ namespace Api.Services.Services
 
         public async Task CreateAsync(AccessToken token) => await _tokenManager.CreateAsync(token);
 
-        public async Task<DeleteResult> DeleteManyAsync(Request request) => await _tokenManager.DeleteManyAsync(request);
+        public async Task<DeleteResult> DeleteManyAsync(ListResourceRequest request) => await _tokenManager.DeleteManyAsync(request);
 
         public async Task<DeleteResult> DeleteManyAsync(FilterDefinition<AccessToken> filter) => await _tokenManager.DeleteManyAsync(filter);
     }

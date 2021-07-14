@@ -7,14 +7,14 @@ namespace Api.Services.Services
 {
     public interface IUserRepository
     {
-        Task<IEnumerable<User>> GetAllAsync(Request request);
+        Task<IEnumerable<User>> GetAllAsync(ListResourceRequest request);
 
         Task<User> GetByIdAsync(string id);
 
-        Task<User> GetOneAsync(Request request);
+        Task<User> GetOneAsync(ListResourceRequest request);
 
         Task<User> GetOneAsync(FilterDefinition<User> filter);
 
-        Task<int> CountAsync(Request request);
+        Task<int> CountAsync(ListResourceRequest request);
     }
 }

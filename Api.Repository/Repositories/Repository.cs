@@ -23,13 +23,13 @@ namespace Api.Repository.Repositories
         /// <param name="request">Object of type request</param>
         /// <param name="relations">List of collections referenced</param>
         /// <returns>Mongo documents list</returns>
-        public async Task<IEnumerable<T>> GetAllAsync(Request request, List<Relation> relations)
+        public async Task<IEnumerable<T>> GetAllAsync(ListResourceRequest request, List<Relation> relations)
         {
             var( sort, pageSize, page, entities, filters ) = request;
             var filter = MongoDBDefinitions.BuildFilter<T>(filters);
             var sortTypedFilter = MongoDBDefinitions.BuildSortFilter<T>(sort);
 
-            if (entities.IsEmpty())
+            if (string.IsNullOrEmpty(entities))
             {
                 return await _context
                     .Find(filter)
@@ -61,7 +61,7 @@ namespace Api.Repository.Repositories
         /// <summary>Get one document asynchronous fashion</summary>
         /// <param name="request">Object of type Request</param>
         /// <returns>Mongo document</returns>
-        public async Task<T> GetOneAsync(Request request)
+        public async Task<T> GetOneAsync(ListResourceRequest request)
         {
             var( _, filters ) = request;
             var filter = MongoDBDefinitions.BuildFilter<T>(filters);
@@ -78,7 +78,7 @@ namespace Api.Repository.Repositories
         /// </summary>
         /// <param name="request">Request object model</param>
         /// <returns>Number of documents</returns>
-        public async Task<int> CountAsync(Request request)
+        public async Task<int> CountAsync(ListResourceRequest request)
         {
             var( _, filters ) = request;
             var filter = MongoDBDefinitions.BuildFilter<T>(filters);
