@@ -18,5 +18,7 @@ namespace Api.Repository.Repositories
         Task<int> CountAsync(ListResourceRequest request);
 
         Task<int> CountAsync(FilterDefinition<T> flter);
+
+        Task<int> CountAsync();
     }
 }

@@ -5,44 +5,46 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Localization;
 
-namespace Api.Web.Middlewares
+namespace Api.Web.Attributes
 {
-    public class ProductExistsAttribute : TypeFilterAttribute
+    public class PaymentMethodExistsAttribute : TypeFilterAttribute
     {
-        public ProductExistsAttribute() : base(typeof(ProductExistsFilter)) {}
+        public PaymentMethodExistsAttribute() : base(typeof(PaymentMethodExistsFilter)) { }
 
-        private class ProductExistsFilter : IAsyncActionFilter
+        private class PaymentMethodExistsFilter : IAsyncActionFilter
         {
-            private readonly IProductRepository _productRepository;
+            private readonly IPaymentMethodRepository _paymentMethodRepository;
             private readonly IStringLocalizer<SharedResources> _localizer;
 
-            public ProductExistsFilter
+            public PaymentMethodExistsFilter
             (
-                IProductRepository productRepository,
+                IPaymentMethodRepository paymentMethodRepository,
                 IStringLocalizer<SharedResources> localizer
             )
-                => (_productRepository, _localizer) = (productRepository, localizer);
+                => (_paymentMethodRepository, _localizer) = (paymentMethodRepository, localizer);
+
+            #region snippet_BeforeExecute
 
             public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
             {
                 try
                 {
                     var id = context.ActionArguments["id"] as string;
-                    var product = await _productRepository.GetByIdAsync(id);
+                    var paymentMethod = await _paymentMethodRepository.GetByIdAsync(id);
 
-                    if (product is null)
+                    if (paymentMethod is null)
                     {
                         context.Result = new NotFoundObjectResult(new
                         {
                             Status = false,
-                            Message = _localizer["ProductNotFound"].Value,
-                            Code = "ProductNotFound"
+                            Message = _localizer["PaymentNotFound"].Value,
+                            Code = "PaymentNotFound"
                         });
                         return;
                     }
 
                     await next();
-                    }
+                }
                 catch (FormatException)
                 {
                     context.Result = new BadRequestObjectResult(new
@@ -54,6 +56,8 @@ namespace Api.Web.Middlewares
                     return;
                 }
             }
+
+            #endregion
         }
     }
 }

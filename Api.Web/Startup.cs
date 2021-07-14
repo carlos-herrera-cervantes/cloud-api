@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Globalization;
-using Api.Infrastructure.Container;
 using Api.Repository.Managers;
 using Api.Repository.Repositories;
 using Api.Services.Services;
@@ -32,7 +31,6 @@ namespace Api.Web
                 options.DataAnnotationLocalizerProvider = (type, factory) => factory.Create(typeof(SharedResources));
             });
             services.AddTokenAuthentication(Configuration);
-            services.AddServicesFromInfrastructure(Configuration);
             services.UseSwagger();
             services.AddScoped(typeof(IManager<>), typeof(Manager<>));
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));

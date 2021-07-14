@@ -1,15 +1,12 @@
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using Api.Domain.Constants;
 using Api.Domain.Models;
+using Api.Repository.Extensions;
 using Api.Services.Services;
 using Api.Web.Common;
 using Api.Web.Extensions;
 using Api.Web.Handlers;
-using Api.Web.Middlewares;
+using Api.Web.Attributes;
 using Api.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -71,13 +68,7 @@ namespace Api.Web.Controllers
         public async Task<IActionResult> GetByStation([FromQuery] ListResourceRequest request)
         {
             var token = HttpContext.Request.Headers.ExtractJsonWebToken();
-            var handler = new JwtSecurityTokenHandler();
-            var decoded = handler.ReadJwtToken(token);
-
-            string station = ((List<Claim>)decoded.Claims)?
-                .Where(claim => claim.Type == "station")
-                .Select(claim => claim.Value)
-                .SingleOrDefault();
+            var station = token.SelectClaim("station");
 
             request.Filters = string.IsNullOrEmpty(request.Filters)?
                 $"stationId={station}" :
@@ -102,13 +93,7 @@ namespace Api.Web.Controllers
         public async Task<IActionResult> GetMeAsync()
         {
             var token = HttpContext.Request.Headers.ExtractJsonWebToken();
-            var handler = new JwtSecurityTokenHandler();
-            var decoded = handler.ReadJwtToken(token);
-
-            string sub = ((List<Claim>)decoded.Claims)?
-                .Where(claim => claim.Type == "nameid")
-                .Select(claim => claim.Value)
-                .SingleOrDefault();
+            var sub = token.SelectClaim("nameid");
 
             var user = await _userRepository.GetByIdAsync(sub);
 

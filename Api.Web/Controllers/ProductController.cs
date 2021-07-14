@@ -4,7 +4,7 @@ using Api.Domain.Models;
 using Api.Services.Services;
 using Api.Web.Common;
 using Api.Web.Handlers;
-using Api.Web.Middlewares;
+using Api.Web.Attributes;
 using Api.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -50,11 +50,11 @@ namespace Api.Web.Controllers
             var totalDocuments = await _productRepository.CountAsync(request);
             var products = await _productRepository.GetAllAsync(request);
             return Ok(new
-                {
-                    Status = true,
-                    Data = products,
-                    Paginator = Paginator.Paginate(request, totalDocuments)
-                });
+            {
+                Status = true,
+                Data = products,
+                Paginator = Paginator.Paginate(request, totalDocuments)
+            });
         }
 
         #endregion

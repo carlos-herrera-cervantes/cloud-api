@@ -1,13 +1,10 @@
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using Api.Domain.Constants;
 using Api.Domain.Models;
+using Api.Repository.Extensions;
 using Api.Services.Services;
 using Api.Web.Extensions;
-using Api.Web.Middlewares;
+using Api.Web.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -55,13 +52,7 @@ namespace Api.Web.Controllers
         public async Task<IActionResult> GetMeAsync([FromQuery] ListResourceRequest request)
         {
             var token = HttpContext.Request.Headers.ExtractJsonWebToken();
-            var handler = new JwtSecurityTokenHandler();
-            var decoded = handler.ReadJwtToken(token);
-
-            string station = ((List<Claim>)decoded.Claims)?
-                .Where(claim => claim.Type == "station")
-                .Select(claim => claim.Value)
-                .SingleOrDefault();
+            var station = token.SelectClaim("station");
 
             request.Filters = string.IsNullOrEmpty(request.Filters) ?
                 $"station={station}" :

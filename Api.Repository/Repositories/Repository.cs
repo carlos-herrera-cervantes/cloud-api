@@ -5,6 +5,7 @@ using Api.Infrastructure.Contexts;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Api.Repository.Extensions;
+using Microsoft.Extensions.Configuration;
 
 namespace Api.Repository.Repositories
 {
@@ -12,11 +13,19 @@ namespace Api.Repository.Repositories
     {
         private readonly IMongoCollection<T> _context;
 
-        public Repository(IMongoDBSettings context)
+        private readonly IConfiguration _configuration;
+
+        public Repository(IConfiguration configuration)
         {
-            var client = MongoDBFactory.CreateClient(context.ConnectionString);
-            var database = client.GetDatabase(context.Database);
-            _context = database.GetCollection<T>($"{typeof(T).Name}s");
+            _configuration = configuration;
+
+            var client = MongoDBFactory
+                .CreateClient(_configuration.GetSection("MongoDBSettings").GetSection("ConnectionString").Value);
+
+
+            _context = client
+                .GetDatabase(_configuration.GetSection("MongoDBSettings").GetSection("Database").Value)
+                .GetCollection<T>($"{typeof(T).Name}s");
         }
 
         /// <summary>Get a list of documents</summary>
@@ -92,5 +101,11 @@ namespace Api.Repository.Repositories
         /// <param name="filter">Filter definition</param>
         /// <returns>Number of documents</returns>
         public async Task<int> CountAsync(FilterDefinition<T> filter) => (int)await _context.CountDocumentsAsync(filter);
+
+        /// <summary>
+        /// Counts the documents of a collection
+        /// </summary>
+        /// <returns>Number of documents</returns>
+        public async Task<int> CountAsync() => (int)await _context.CountDocumentsAsync(Builders<T>.Filter.Empty);
     }
 }
