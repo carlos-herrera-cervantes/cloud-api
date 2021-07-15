@@ -21,5 +21,7 @@ namespace Api.Services.Services
         public async Task<User> GetOneAsync(FilterDefinition<User> filter) => await _userRepository.GetOneAsync(filter);
 
         public async Task<int> CountAsync(ListResourceRequest request) => await _userRepository.CountAsync(request);
+
+        public async Task<int> CountAsync() => await _userRepository.CountAsync();
     }
 }

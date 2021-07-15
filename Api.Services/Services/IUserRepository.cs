@@ -16,5 +16,7 @@ namespace Api.Services.Services
         Task<User> GetOneAsync(FilterDefinition<User> filter);
 
         Task<int> CountAsync(ListResourceRequest request);
+
+        Task<int> CountAsync();
     }
 }

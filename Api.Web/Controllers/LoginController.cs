@@ -1,12 +1,11 @@
 using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Api.Domain.Constants;
 using Api.Domain.Models;
+using Api.Repository.Extensions;
 using Api.Services.Services;
 using Api.Web.Extensions;
 using Microsoft.AspNetCore.Authorization;
@@ -55,6 +54,9 @@ namespace Api.Web.Controllers
         public async Task<IActionResult> Login([FromBody] Credentials credentials)
         {
             var user = await GetUserByEmail(credentials.Email);
+
+            if (user.GetType().Name == "Boolean") return BadRequest();
+
             await DeleteSepecificTokens(user.Id);
 
             var token = await GetToken(credentials, user);
@@ -85,12 +87,7 @@ namespace Api.Web.Controllers
         public async Task<IActionResult> Logout()
         {
             var token = HttpContext.Request.Headers.ExtractJsonWebToken();
-            var handler = new JwtSecurityTokenHandler();
-            var decoded = handler.ReadJwtToken(token);
-            var id = ((List<Claim>)decoded.Claims)?
-                .Where(claim => claim.Type == "nameid")
-                .Select(claim => claim.Value)
-                .SingleOrDefault();
+            var id = token.SelectClaim("nameid");
 
             await DeleteSepecificTokens(id);
             return NoContent();
@@ -117,7 +114,7 @@ namespace Api.Web.Controllers
                     new Claim(ClaimTypes.Email, credentials.Email),
                     new Claim(ClaimTypes.Role, user.Role),
                     new Claim(ClaimTypes.NameIdentifier, user.Id),
-                    new Claim("station", user.StationId)
+                    new Claim("station", string.IsNullOrEmpty(user.StationId) ? "" : user.StationId)
                 });
             var tokenDescriptor = new SecurityTokenDescriptor
             {
@@ -169,7 +166,7 @@ namespace Api.Web.Controllers
         /// Deletes a set of tokens that belongs to the user in session
         /// </summary>
         /// <param name="id">User ID</param>
-        /// <returns></returns>
+        /// <returns>Delete result</returns>
         private async Task DeleteSepecificTokens(string id)
             => await _tokenManager.DeleteManyAsync(Builders<AccessToken>.Filter.Where(t => t.UserId == id));
 

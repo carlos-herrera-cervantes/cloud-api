@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.IdentityModel.Tokens.Jwt;
 using Api.Domain.Constants;
 using Api.Domain.Models;
 
@@ -36,5 +37,21 @@ namespace Api.Repository.Extensions
                 Operation = Operators.Lower,
                 Value = Regex.Split(value, Operators.LowerRegex).Last() } : 
             throw new InvalidOperationException();
+
+        /// <summary>
+        /// Takes the value of claim entered by the user
+        /// </summary>
+        /// <param name="key">Claim name</param>
+        /// <returns>Value of claim</returns>
+        public static string SelectClaim(this string value, string key)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var decoded = handler.ReadJwtToken(value);
+            
+            return decoded.Claims.ToList()
+                .Where(claim => claim.Type == key)
+                .Select(claim => claim.Value)
+                .SingleOrDefault();
+        }
     }
 }

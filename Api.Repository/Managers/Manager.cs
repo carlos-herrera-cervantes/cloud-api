@@ -3,6 +3,7 @@ using Api.Domain.Models;
 using Api.Infrastructure.Contexts;
 using Api.Repository.Extensions;
 using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
 
 namespace Api.Repository.Managers
@@ -11,11 +12,18 @@ namespace Api.Repository.Managers
     {
         private readonly IMongoCollection<T> _context;
 
-        public Manager(IMongoDBSettings context)
+        private readonly IConfiguration _configuration;
+
+        public Manager(IConfiguration configuration)
         {
-            var client = MongoDBFactory.CreateClient(context.ConnectionString);
-            var database = client.GetDatabase(context.Database);
-            _context = database.GetCollection<T>($"{typeof(T).Name}s");
+            _configuration = configuration;
+
+            var client = MongoDBFactory
+                .CreateClient(_configuration.GetSection("MongoDBSettings").GetSection("ConnectionString").Value);
+
+            _context = client
+                .GetDatabase(_configuration.GetSection("MongoDBSettings").GetSection("Database").Value)
+                .GetCollection<T>($"{typeof(T).Name}s");
         }
 
         public async Task CreateAsync(T instance) => await _context.InsertOneAsync(instance);

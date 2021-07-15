@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Localization;
 
-namespace Api.Web.Middlewares
+namespace Api.Web.Attributes
 {
     public class SetPaginateAttribute : TypeFilterAttribute
     {

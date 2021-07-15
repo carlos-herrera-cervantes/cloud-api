@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Localization;
 using MongoDB.Driver;
 
-namespace Api.Web.Middlewares
+namespace Api.Web.Attributes
 {
     public class RoleAttribute : TypeFilterAttribute
     {

@@ -4,7 +4,7 @@ using Api.Domain.Models;
 using Api.Services.Services;
 using Api.Web.Common;
 using Api.Web.Handlers;
-using Api.Web.Middlewares;
+using Api.Web.Attributes;
 using Api.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
