@@ -6,6 +6,7 @@ using Api.Services.Services;
 using Api.Web.Backgrounds;
 using Api.Web.Extensions;
 using Api.Web.Handlers;
+using Api.Web.Middlewares;
 using Api.Web.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -63,6 +64,7 @@ namespace Api.Web
                 new CultureInfo("en")
             };
 
+            app.UseMiddleware<SecurityHeadersMiddleware>();
             app.UseRequestLocalization(options =>
             {
                 options.DefaultRequestCulture = new RequestCulture("es");
