@@ -25,12 +25,17 @@ namespace Api.Web.Controllers
         private readonly IPaymentMethodRepository _paymentMethodRepository;
         private readonly IOperationHandler _operationHandler;
 
-        public PaymentMethodController(
+        public PaymentMethodController
+        (
             IPaymentMethodManager paymentMethodManager, 
             IPaymentMethodRepository paymentMethodRepository, 
             IOperationHandler operationHandler
         )
-        => (_paymentMethodManager, _paymentMethodRepository, _operationHandler) = (paymentMethodManager, paymentMethodRepository, operationHandler);
+        {
+            _paymentMethodManager = paymentMethodManager;
+            _paymentMethodRepository = paymentMethodRepository;
+            _operationHandler = operationHandler;
+        }
 
         #region snippet_GetAll
 
@@ -44,7 +49,11 @@ namespace Api.Web.Controllers
         {
             var totalDocuments = await _paymentMethodRepository.CountAsync(request);
             var paymentMethods = await _paymentMethodRepository.GetAllAsync(request);
-            return Ok(new { Status = true, Data = paymentMethods, Paginator = Paginator.Paginate(request, totalDocuments) });
+            return Ok(new ListPaymentMethodResponse
+            {
+                Data = paymentMethods,
+                Paginator = Paginator.Paginate(request, totalDocuments)
+            });
         }
 
         #endregion
@@ -61,7 +70,7 @@ namespace Api.Web.Controllers
         public async Task<IActionResult> GetByIdAsync(string id)
         {
             var paymentMethod = await _paymentMethodRepository.GetByIdAsync(id);
-            return Ok(new { Status = true, Data = paymentMethod });
+            return Ok(new SinglePaymentMethodResponse { Data = paymentMethod });
         }
 
         #endregion
@@ -85,7 +94,7 @@ namespace Api.Web.Controllers
                 Model = paymentMethod
             });
             
-            return Created("", new { Status = true, Data = paymentMethod });
+            return Created("", new SinglePaymentMethodResponse { Data = paymentMethod });
         }
 
         #endregion
@@ -112,7 +121,7 @@ namespace Api.Web.Controllers
                 Model = paymentMethod
             });
 
-            return Created("", new { Status = true, Data = paymentMethod });
+            return Ok(new SinglePaymentMethodResponse { Data = paymentMethod });
         }
 
         #endregion

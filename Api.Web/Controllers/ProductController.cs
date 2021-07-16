@@ -49,9 +49,8 @@ namespace Api.Web.Controllers
         {
             var totalDocuments = await _productRepository.CountAsync(request);
             var products = await _productRepository.GetAllAsync(request);
-            return Ok(new
+            return Ok(new ListProductResponse
             {
-                Status = true,
                 Data = products,
                 Paginator = Paginator.Paginate(request, totalDocuments)
             });
@@ -71,7 +70,7 @@ namespace Api.Web.Controllers
         public async Task<IActionResult> GetByIdAsync(string id)
         {
             var product = await _productRepository.GetByIdAsync(id);
-            return Ok(new { Status = true, Data = product });
+            return Ok(new SingleProductResponse { Data = product });
         }
 
         #endregion
@@ -95,7 +94,7 @@ namespace Api.Web.Controllers
                 Model = product
             });
 
-            return Created("", new { Status = true, Data = product });
+            return Created("", new SingleProductResponse { Data = product });
         }
 
         #endregion
@@ -122,7 +121,7 @@ namespace Api.Web.Controllers
                 Model = product
             });
 
-            return Created("", new { Status = true, Data = product });
+            return Ok(new SingleProductResponse { Data = product });
         }
 
         #endregion

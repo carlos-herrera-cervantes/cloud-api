@@ -20,7 +20,8 @@ namespace Api.Web.Backgrounds
         private readonly ICustomerPurchaseManager _customerPurchaseManager;
         private readonly ICustomerPurchaseRepository _customerPurchaseRepository;
 
-        public FirebaseConsumer(
+        public FirebaseConsumer
+        (
             FirebaseClient firebaseClient,
             IOperationHandler operationHandler,
             IServiceScopeFactory factory
@@ -99,14 +100,14 @@ namespace Api.Web.Backgrounds
         #region BuildFirebaseQueryForProductsCollection
 
         private Task BuildQueryProducts(CollectionEventReceived message)
-            => _firebaseClient.Child($"{_path}/products/tasks/{message.Id}").PutAsync(message);
+            => _firebaseClient.Child($"{_path}/products/tasks/{Guid.NewGuid()}").PutAsync(message);
 
         #endregion
 
         #region BuildFirebaseQueryForPaymentMethodCollection
 
         private Task BuildQueryPaymentMethod(CollectionEventReceived message)
-            => _firebaseClient.Child($"{_path}/payments/tasks/{message.Id}").PutAsync(message);
+            => _firebaseClient.Child($"{_path}/payments/tasks/{Guid.NewGuid()}").PutAsync(message);
 
         #endregion
 
