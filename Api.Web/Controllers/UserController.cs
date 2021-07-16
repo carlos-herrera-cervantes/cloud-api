@@ -51,9 +51,9 @@ namespace Api.Web.Controllers
         {
             var totalDocuments = await _userRepository.CountAsync(request);
             var users = await _userRepository.GetAllAsync(request);
-            return Ok(new
+
+            return Ok(new ListUserResponse
             {
-                Status = true,
                 Data = users,
                 Paginator = Paginator.Paginate(request, totalDocuments)
             });
@@ -77,9 +77,8 @@ namespace Api.Web.Controllers
             var totalDocuments = await _userRepository.CountAsync(request);
             var users = await _userRepository.GetAllAsync(request);
 
-            return Ok(new
+            return Ok(new ListUserResponse
             {
-                Status = true,
                 Data = users,
                 Paginator = Paginator.Paginate(request, totalDocuments)
             });
@@ -97,7 +96,7 @@ namespace Api.Web.Controllers
 
             var user = await _userRepository.GetByIdAsync(sub);
 
-            return Ok(new { Status = true, Data = user });
+            return Ok(new SingleUserResponse { Data = user });
         }
 
         [HttpGet("{id}")]
@@ -110,7 +109,7 @@ namespace Api.Web.Controllers
         public async Task<IActionResult> GetByIdAsync(string id)
         {
             var user = await _userRepository.GetByIdAsync(id);
-            return Ok(new { Status = true, Data = user });
+            return Ok(new SingleUserResponse { Data = user });
         }
 
         #endregion
@@ -134,7 +133,7 @@ namespace Api.Web.Controllers
                 Model = user
             });
 
-            return Created("", new { Status = true, Data = user });
+            return Created("", new SingleUserResponse { Data = user });
         }
 
         #endregion
@@ -162,7 +161,7 @@ namespace Api.Web.Controllers
                 Model = user
             });
             
-            return Created("", new { Status = true, Data = user });
+            return Ok(new SingleUserResponse { Data = user });
         }
 
         #endregion

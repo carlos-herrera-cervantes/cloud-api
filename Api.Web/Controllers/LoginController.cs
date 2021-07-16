@@ -53,15 +53,15 @@ namespace Api.Web.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Login([FromBody] Credentials credentials)
         {
-            var user = await GetUserByEmail(credentials.Email);
+            var user = await _userRepository.GetOneAsync(Builders<User>.Filter.Where(u => u.Email == credentials.Email));
 
-            if (user.GetType().Name == "Boolean") return BadRequest();
+            if (user is null || credentials.Password == user.Password) return BadRequest();
 
             await DeleteSepecificTokens(user.Id);
 
-            var token = await GetToken(credentials, user);
+            var token = GetToken(credentials, user);
 
-            if (token is false || user.Role == Roles.Employee) return NotFound(new
+            if (token is null || user.Role == Roles.Employee) return NotFound(new
                 { 
                     Status = false,
                     Code = "InvalidCredentials",
@@ -103,12 +103,8 @@ namespace Api.Web.Controllers
         /// <param name="credentials">User email and password</param>
         /// <param name="user">User model</param>
         /// <returns>Json Web Token</returns>
-        private async Task<dynamic> GetToken(Credentials credentials, User user)
+        private string GetToken(Credentials credentials, User user)
         {
-            var isValidCredentials = await ValidateCredentials(credentials);
-            
-            if (isValidCredentials is false) return false;
-
             var claims = new ClaimsIdentity(new[]
                 { 
                     new Claim(ClaimTypes.Email, credentials.Email),
@@ -130,36 +126,6 @@ namespace Api.Web.Controllers
             var createdToken = tokenHandler.CreateToken(tokenDescriptor);
 
             return tokenHandler.WriteToken(createdToken);
-        }
-
-        /// <summary>
-        /// Check if the entered credentials are valid
-        /// </summary>
-        /// <param name="credentials">User email and password</param>
-        /// <returns>If they are valid returns true</returns>
-        private async Task<bool> ValidateCredentials(Credentials credentials)
-        {
-            var user = await GetUserByEmail(credentials.Email);
-            
-            if (user is false) return false;
-
-            var isValidPassword = credentials.Password == user.Password;
-            
-            if (isValidPassword) return true;
-
-            return false;
-        }
-
-        /// <summary>
-        /// Returns user model
-        /// </summary>
-        /// <param name="email">User email</param>
-        /// <returns>User model</returns>
-        private async Task<dynamic> GetUserByEmail(string email)
-        {
-            var user = await _userRepository.GetOneAsync(Builders<User>.Filter.Where(u => u.Email == email));
-            if (user is null) return false;
-            return user;
         }
 
         /// <summary>

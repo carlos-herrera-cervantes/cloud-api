@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Api.Domain.Constants;
 using Api.Services.Services;
 using Api.Web.Extensions;
+using Api.Repository.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Localization;
@@ -46,18 +46,8 @@ namespace Api.Web.Attributes
                     }
 
                     var token = context.HttpContext.Request.Headers.ExtractJsonWebToken();
-                    var handler = new JwtSecurityTokenHandler();
-                    var decoded = handler.ReadJwtToken(token);
-
-                    string role = ((List<Claim>)decoded.Claims)?
-                        .Where(claim => claim.Type == "role")
-                        .Select(claim => claim.Value)
-                        .SingleOrDefault();
-                
-                    string station = ((List<Claim>)decoded.Claims)?
-                        .Where(claim => claim.Type == "station")
-                        .Select(claim => claim.Value)
-                        .SingleOrDefault();
+                    string role = token.SelectClaim("role");
+                    string station = token.SelectClaim("station");
 
                     if (role == Roles.StationAdmin && station != user.StationId)
                     {

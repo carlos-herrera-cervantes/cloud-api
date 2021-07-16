@@ -20,7 +20,8 @@ namespace Api.Web.Backgrounds
         private readonly ICustomerPurchaseManager _customerPurchaseManager;
         private readonly ICustomerPurchaseRepository _customerPurchaseRepository;
 
-        public FirebaseConsumer(
+        public FirebaseConsumer
+        (
             FirebaseClient firebaseClient,
             IOperationHandler operationHandler,
             IServiceScopeFactory factory

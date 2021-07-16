@@ -100,6 +100,6 @@ namespace Api.Domain.Models
     public class ListCustomerPurchaseResponse : ListBaseResponse
     {
         [JsonProperty("data")]
-        public List<CustomerPurchase> Data { get; set; }
+        public IEnumerable<CustomerPurchase> Data { get; set; }
     }
 }

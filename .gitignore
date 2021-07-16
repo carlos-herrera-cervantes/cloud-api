@@ -10,4 +10,6 @@ Api.Web/obj/
 Api.Web/appsettings.*
 Api.Repository/obj/
 Api.Repository/bin/
+Api.Tests/obj
+Api.Tests/bin
 .vscode
