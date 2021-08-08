@@ -51,6 +51,6 @@ namespace Api.Domain.Models
     public class ListUserResponse : ListBaseResponse
     {
         [JsonProperty("data")]
-        public List<User> Data { get; set; }
+        public IEnumerable<User> Data { get; set; }
     }
 }

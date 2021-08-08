@@ -36,6 +36,6 @@ namespace Api.Domain.Models
     public class ListPaymentMethodResponse : ListBaseResponse
     {
         [JsonProperty("data")]
-        public List<PaymentMethod> Data { get; set; }
+        public IEnumerable<PaymentMethod> Data { get; set; }
     }
 }

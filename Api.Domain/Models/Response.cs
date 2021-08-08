@@ -22,4 +22,10 @@ namespace Api.Domain.Models
         [JsonProperty("code")]
         public string Code { get; set; }
     }
+
+    public class StringResponse : BaseResponse
+    {
+        [JsonProperty("data")]
+        public string Data { get; set; }
+    }
 }

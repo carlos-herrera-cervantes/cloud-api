@@ -49,9 +49,8 @@ namespace Api.Web.Controllers
         {
             var totalDocuments = await _stationRepository.CountAsync(request);
             var stations = await _stationRepository.GetAllAsync(request);
-            return Ok(new
+            return Ok(new ListStationResponse
             {
-                Status = true,
                 Data = stations,
                 Paginator = Paginator.Paginate(request, totalDocuments)
             });
@@ -71,7 +70,7 @@ namespace Api.Web.Controllers
         public async Task<IActionResult> GetByIdAsync(string id)
         {
             var station = await _stationRepository.GetByIdAsync(id);
-            return Ok(new { Status = true, Data = station });
+            return Ok(new SingleStationResponse { Data = station });
         }
 
         #endregion
@@ -95,7 +94,7 @@ namespace Api.Web.Controllers
                 Model = station
             });
             
-            return Created("", new { Status = true, Data = station });
+            return Created("", new SingleStationResponse { Data = station });
         }
 
         #endregion
@@ -122,7 +121,7 @@ namespace Api.Web.Controllers
                 Model = station
             });
 
-            return Created("", new { Status = true, Data = station });
+            return Ok(new SingleStationResponse { Data = station });
         }
 
         #endregion

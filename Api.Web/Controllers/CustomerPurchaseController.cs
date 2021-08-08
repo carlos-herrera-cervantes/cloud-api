@@ -35,9 +35,8 @@ namespace Api.Web.Controllers
         {
             var totalDocuments = await _customerPurchaseRepository.CountAsync(request);
             var purchases = await _customerPurchaseRepository.GetAllAsync(request);
-            return Ok(new
+            return Ok(new ListCustomerPurchaseResponse
             {
-                Status = true,
                 Data = purchases,
                 Paginator = Paginator.Paginate(request, totalDocuments)
             });
@@ -61,9 +60,8 @@ namespace Api.Web.Controllers
             var totalDocuments = await _customerPurchaseRepository.CountAsync(request);
             var purchases = await _customerPurchaseRepository.GetAllAsync(request);
 
-            return Ok(new
+            return Ok(new ListCustomerPurchaseResponse
             {
-                Status = true,
                 Data = purchases,
                 Paginator = Paginator.Paginate(request, totalDocuments)
             });
@@ -79,7 +77,7 @@ namespace Api.Web.Controllers
         public async Task<IActionResult> GetByIdAsync(string id, [FromQuery] SingleResourceRequest request)
         {
             var purchase = await _customerPurchaseRepository.GetByIdAsync(id);
-            return Ok(new { Status = true, Data = purchase});
+            return Ok(new SingleCustomerPurchaseResponse { Data = purchase });
         }
 
         #endregion
