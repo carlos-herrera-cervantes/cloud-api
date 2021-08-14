@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using ServiceStack.Redis;
 
 namespace Api.Web.Controllers
 {
@@ -24,17 +25,20 @@ namespace Api.Web.Controllers
         private readonly IProductManager _productManager;
         private readonly IProductRepository _productRepository;
         private readonly IOperationHandler _operationHandler;
+        private readonly IRedisClientsManagerAsync _redisManager;
 
         public ProductController
         (
             IProductManager productManager,
             IProductRepository productRepository,
-            IOperationHandler operationHandler
+            IOperationHandler operationHandler,
+            IRedisClientsManagerAsync redisManager
         )
         {
             _productManager = productManager;
             _productRepository = productRepository;
             _operationHandler = operationHandler;
+            _redisManager = redisManager;
         }
 
         #region snippet_GetAll
@@ -69,7 +73,11 @@ namespace Api.Web.Controllers
         [ProductExists]
         public async Task<IActionResult> GetByIdAsync(string id)
         {
-            var product = await _productRepository.GetByIdAsync(id);
+            await using var redisClient = await _redisManager.GetClientAsync();
+
+            var product = await redisClient.GetAsync<Product>(id) ??
+                await _productRepository.GetByIdAsync(id);
+
             return Ok(new SingleProductResponse { Data = product });
         }
 
@@ -111,8 +119,13 @@ namespace Api.Web.Controllers
         [ProductExists]
         public async Task<IActionResult> UpdateByIdAsync(string id, [FromBody] JsonPatchDocument<Product> replaceProduct)
         {
-            var product = await _productRepository.GetByIdAsync(id);
+            await using var redisClient = await _redisManager.GetClientAsync();
+
+            var product = await redisClient.GetAsync<Product>(id) ??
+                await _productRepository.GetByIdAsync(id);
+
             await _productManager.UpdateByIdAsync(id, product, replaceProduct);
+
             Emitter.EmitMessage(_operationHandler, new CollectionEventReceived
             {
                 Type = EventType.Update,
@@ -120,6 +133,8 @@ namespace Api.Web.Controllers
                 Id = id,
                 Model = product
             });
+
+            await redisClient.RemoveAsync(id);
 
             return Ok(new SingleProductResponse { Data = product });
         }
@@ -137,7 +152,9 @@ namespace Api.Web.Controllers
         [ProductExists]
         public async Task<IActionResult> DeleteByIdAsync(string id)
         {
+            await using var redisClient = await _redisManager.GetClientAsync();
             await _productManager.DeleteByIdAsync(id);
+
             Emitter.EmitMessage(_operationHandler, new CollectionEventReceived
             {
                 Type = EventType.Delete,
@@ -145,6 +162,8 @@ namespace Api.Web.Controllers
                 Id = id,
                 Model = null
             });
+
+            await redisClient.RemoveAsync(id);
 
             return NoContent();
         }

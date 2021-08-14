@@ -8,7 +8,12 @@ namespace Api.Services.Services
     {
         Task CreateAsync(CustomerPurchase customerPurchase);
 
-        Task UpdateByIdAsync(string id, CustomerPurchase newCustomerPurchase, JsonPatchDocument<CustomerPurchase> currentCustomerPurchase);
+        Task UpdateByIdAsync
+        (
+            string id,
+            CustomerPurchase newCustomerPurchase,
+            JsonPatchDocument<CustomerPurchase> currentCustomerPurchase
+        );
 
         Task DeleteByIdAsync(string id);
     }

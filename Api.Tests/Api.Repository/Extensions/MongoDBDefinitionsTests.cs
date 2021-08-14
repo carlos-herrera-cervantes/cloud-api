@@ -24,7 +24,9 @@ namespace Api.Tests.Api.Repository.Extensions
 
             var result = MongoDBDefinitions.BuildFilter<User>(filters);
 
-            Assert.Equal(Builders<User>.Filter.Where(entity => (entity.FirstName == "Isela")).ToString(), result.ToString());
+            Assert
+                .Equal(Builders<User>.Filter.Where(entity => (entity.FirstName == "Isela"))
+                .ToString(), result.ToString());
         }
 
         [Fact]

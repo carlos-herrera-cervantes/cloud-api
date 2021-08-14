@@ -25,7 +25,7 @@ namespace Api.Tests.Api.Services.Services
         };
 
         [Fact]
-        public async Task CreateAsync_Should_Add_New_Station()
+        public async Task CreateAsync_ShouldAdd_NewStation()
         {
             var mockManager = new Mock<IManager<Station>>();
             var station = new Station
@@ -54,7 +54,7 @@ namespace Api.Tests.Api.Services.Services
         }
 
         [Fact]
-        public async Task UpdateByIdAsync_Should_Update_Existing_Station()
+        public async Task UpdateByIdAsync_ShouldUpdate_ExistingStation()
         {
             var mockManager = new Mock<IManager<Station>>();
             var station = new Station
@@ -73,7 +73,8 @@ namespace Api.Tests.Api.Services.Services
             var updatedProperties = new JsonPatchDocument<Station>();
             updatedProperties.Replace(s => s.Name, NEW_NAME);
 
-            mockManager.Setup(manager => manager.UpdateByIdAsync(It.IsAny<string>(), It.IsAny<Station>(), It.IsAny<JsonPatchDocument<Station>>()))
+            mockManager.Setup(manager => manager
+                .UpdateByIdAsync(It.IsAny<string>(), It.IsAny<Station>(), It.IsAny<JsonPatchDocument<Station>>()))
                 .Callback((string id, Station station, JsonPatchDocument<Station> updatedProperties) =>
                 {
                     updatedProperties.ApplyTo(station);
@@ -84,12 +85,13 @@ namespace Api.Tests.Api.Services.Services
 
             await stationManager.UpdateByIdAsync(OBJECT_ID, station, updatedProperties);
 
-            mockManager.Verify(x => x.UpdateByIdAsync(It.IsAny<string>(), It.IsAny<Station>(), It.IsAny<JsonPatchDocument<Station>>()), Times.Once);
+            mockManager.Verify(x =>
+                x.UpdateByIdAsync(It.IsAny<string>(), It.IsAny<Station>(), It.IsAny<JsonPatchDocument<Station>>()), Times.Once);
             Assert.Equal(station.Name, NEW_NAME);
         }
 
         [Fact]
-        public async Task DeleteByIdAsync_Should_Delete_Correct_Station()
+        public async Task DeleteByIdAsync_ShouldDelete_CorrectStation()
         {
             var mockManager = new Mock<IManager<Station>>();
 

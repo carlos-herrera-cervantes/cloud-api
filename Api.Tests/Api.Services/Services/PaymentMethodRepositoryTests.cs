@@ -32,7 +32,7 @@ namespace Api.Tests.Api.Services.Services
         };
 
         [Fact]
-        public async Task GetAllAsync_Should_Return_PaymentMethods_List()
+        public async Task GetAllAsync_ShouldReturn_PaymentMethodsList()
         {
             var mockRepository = new Mock<IRepository<PaymentMethod>>();
 
@@ -54,7 +54,7 @@ namespace Api.Tests.Api.Services.Services
         }
 
         [Fact]
-        public async Task GetByIdAsync_Should_Return_Correct_PaymentMethod()
+        public async Task GetByIdAsync_ShouldReturn_CorrectPaymentMethod()
         {
             var mockRepository = new Mock<IRepository<PaymentMethod>>();
 
@@ -71,7 +71,7 @@ namespace Api.Tests.Api.Services.Services
         }
 
         [Fact]
-        public async Task CountAsync_Should_Return_Number_PaymentMethods()
+        public async Task CountAsync_ShouldReturn_NumberPaymentMethods()
         {
             var mockRepository = new Mock<IRepository<PaymentMethod>>();
 

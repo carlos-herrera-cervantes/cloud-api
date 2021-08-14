@@ -1,9 +1,11 @@
 using System;
 using System.Threading.Tasks;
+using Api.Domain.Models;
 using Api.Services.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Localization;
+using ServiceStack.Redis;
 
 namespace Api.Web.Attributes
 {
@@ -15,13 +17,19 @@ namespace Api.Web.Attributes
         {
             private readonly IProductRepository _productRepository;
             private readonly IStringLocalizer<SharedResources> _localizer;
+            private readonly IRedisClientsManagerAsync _redisManager;
 
             public ProductExistsFilter
             (
                 IProductRepository productRepository,
-                IStringLocalizer<SharedResources> localizer
+                IStringLocalizer<SharedResources> localizer,
+                IRedisClientsManagerAsync redisManager
             )
-                => (_productRepository, _localizer) = (productRepository, localizer);
+            {
+                _productRepository = productRepository;
+                _localizer = localizer;
+                _redisManager = redisManager;
+            }
 
             public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
             {
@@ -40,6 +48,14 @@ namespace Api.Web.Attributes
                         });
                         return;
                     }
+
+                    await using var redisClient = await _redisManager.GetClientAsync();
+                    await redisClient.SetAsync<Product>
+                        (
+                            product.Id,
+                            product,
+                            expiresAt: DateTime.UtcNow.AddMinutes(10)
+                        );
 
                     await next();
                     }

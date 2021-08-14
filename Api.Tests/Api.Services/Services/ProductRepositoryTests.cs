@@ -34,7 +34,7 @@ namespace Api.Tests.Api.Services.Services
         };
 
         [Fact]
-        public async Task GetAllAsync_Should_Return_Products_List()
+        public async Task GetAllAsync_ShouldReturn_ProductsList()
         {
             var mockRepository = new Mock<IRepository<Product>>();
 
@@ -56,7 +56,7 @@ namespace Api.Tests.Api.Services.Services
         }
 
         [Fact]
-        public async Task GetByIdAsync_Should_Return_Correct_Product()
+        public async Task GetByIdAsync_ShouldReturn_CorrectProduct()
         {
             var mockRepository = new Mock<IRepository<Product>>();
 
@@ -73,7 +73,7 @@ namespace Api.Tests.Api.Services.Services
         }
 
         [Fact]
-        public async Task CountAsync_Should_Return_Number_Products()
+        public async Task CountAsync_ShouldReturn_NumberProducts()
         {
             var mockRepository = new Mock<IRepository<Product>>();
 

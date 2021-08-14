@@ -20,11 +20,15 @@ namespace Api.Repository.Repositories
             _configuration = configuration;
 
             var client = MongoDBFactory
-                .CreateClient(_configuration.GetSection("MongoDBSettings").GetSection("ConnectionString").Value);
+                .CreateClient(_configuration
+                .GetSection("MongoDBSettings")
+                .GetSection("ConnectionString").Value);
 
 
             _context = client
-                .GetDatabase(_configuration.GetSection("MongoDBSettings").GetSection("Database").Value)
+                .GetDatabase(_configuration
+                .GetSection("MongoDBSettings")
+                .GetSection("Database").Value)
                 .GetCollection<T>($"{typeof(T).Name}s");
         }
 
@@ -65,7 +69,8 @@ namespace Api.Repository.Repositories
         /// <summary>Get one document asynchronous fashion using its ID</summary>
         /// <param name="id">The string for object ID</param>
         /// <returns>Mongo document</returns>
-        public async Task<T> GetByIdAsync(string id) => await _context.Find(entity => entity.Id == id).FirstOrDefaultAsync();
+        public async Task<T> GetByIdAsync(string id)
+            => await _context.Find(entity => entity.Id == id).FirstOrDefaultAsync();
 
         /// <summary>Get one document asynchronous fashion</summary>
         /// <param name="request">Object of type Request</param>
@@ -80,7 +85,8 @@ namespace Api.Repository.Repositories
         /// <summary>Get one document asynchronous fashion</summary>
         /// <param name="filter">Filter definition</param>
         /// <returns>Mongo document</returns>
-        public async Task<T> GetOneAsync(FilterDefinition<T> filter) => await _context.Find(filter).FirstOrDefaultAsync();
+        public async Task<T> GetOneAsync(FilterDefinition<T> filter)
+            => await _context.Find(filter).FirstOrDefaultAsync();
 
         /// <summary>
         /// Counts the documents of a collection
@@ -100,12 +106,14 @@ namespace Api.Repository.Repositories
         /// </summary>
         /// <param name="filter">Filter definition</param>
         /// <returns>Number of documents</returns>
-        public async Task<int> CountAsync(FilterDefinition<T> filter) => (int)await _context.CountDocumentsAsync(filter);
+        public async Task<int> CountAsync(FilterDefinition<T> filter)
+            => (int)await _context.CountDocumentsAsync(filter);
 
         /// <summary>
         /// Counts the documents of a collection
         /// </summary>
         /// <returns>Number of documents</returns>
-        public async Task<int> CountAsync() => (int)await _context.CountDocumentsAsync(Builders<T>.Filter.Empty);
+        public async Task<int> CountAsync()
+            => (int)await _context.CountDocumentsAsync(Builders<T>.Filter.Empty);
     }
 }

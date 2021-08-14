@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using ServiceStack.Redis;
 
 namespace Api.Web.Controllers
 {
@@ -24,17 +25,20 @@ namespace Api.Web.Controllers
         private readonly IStationManager _stationManager;
         private readonly IStationRepository _stationRepository;
         private readonly IOperationHandler _operationHandler;
+        private readonly IRedisClientsManagerAsync _redisManager;
 
         public StationController
         (
             IStationManager stationManager,
             IStationRepository stationRepository,
-            IOperationHandler operationHandler
+            IOperationHandler operationHandler,
+            IRedisClientsManagerAsync redisManager
         )
         {
             _stationManager = stationManager;
             _stationRepository = stationRepository;
             _operationHandler = operationHandler;
+            _redisManager = redisManager;
         }
 
         #region snippet_GetAll
@@ -69,7 +73,11 @@ namespace Api.Web.Controllers
         [StationExists]
         public async Task<IActionResult> GetByIdAsync(string id)
         {
-            var station = await _stationRepository.GetByIdAsync(id);
+            await using var redisClient = await _redisManager.GetClientAsync();
+
+            var station = await redisClient.GetAsync<Station>(id) ??
+                await _stationRepository.GetByIdAsync(id);
+
             return Ok(new SingleStationResponse { Data = station });
         }
 
@@ -111,8 +119,13 @@ namespace Api.Web.Controllers
         [StationExists]
         public async Task<IActionResult> UpdateByIdAsync(string id, [FromBody] JsonPatchDocument<Station> replaceStation)
         {
-            var station = await _stationRepository.GetByIdAsync(id);
+            await using var redisClient = await _redisManager.GetClientAsync();
+
+            var station = await redisClient.GetAsync<Station>(id) ??
+                await _stationRepository.GetByIdAsync(id);
+
             await _stationManager.UpdateByIdAsync(id, station, replaceStation);
+
             Emitter.EmitMessage(_operationHandler, new CollectionEventReceived
             {
                 Type = EventType.Update,
@@ -120,6 +133,8 @@ namespace Api.Web.Controllers
                 Id = id,
                 Model = station
             });
+
+            await redisClient.RemoveAsync(id);
 
             return Ok(new SingleStationResponse { Data = station });
         }
@@ -138,6 +153,7 @@ namespace Api.Web.Controllers
         public async Task<IActionResult> DeleteByIdAsync(string id)
         {
             await _stationManager.DeleteByIdAsync(id);
+
             Emitter.EmitMessage(_operationHandler, new CollectionEventReceived
             {
                 Type = EventType.Delete,
@@ -145,6 +161,9 @@ namespace Api.Web.Controllers
                 Id = id,
                 Model = null
             });
+
+            await using var redisClient = await _redisManager.GetClientAsync();
+            await redisClient.RemoveAsync(id);
             
             return NoContent();
         }

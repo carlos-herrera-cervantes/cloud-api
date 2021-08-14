@@ -49,7 +49,14 @@ namespace Api.Domain.Models
 
         #region snippet_Deconstruct
 
-        public void Deconstruct(out string sort, out int pageSize, out int page, out string entities, out string filters)
+        public void Deconstruct
+        (
+            out string sort,
+            out int pageSize,
+            out int page,
+            out string entities,
+            out string filters
+        )
         {
             sort = Sort;
             pageSize = PageSize;

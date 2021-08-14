@@ -34,7 +34,7 @@ namespace Api.Tests.Api.Services.Services
         };
 
         [Fact]
-        public async Task GetAllAsync_Should_Return_Stations_List()
+        public async Task GetAllAsync_ShouldReturn_StationsList()
         {
             var mockRepository = new Mock<IRepository<Station>>();
 
@@ -56,7 +56,7 @@ namespace Api.Tests.Api.Services.Services
         }
 
         [Fact]
-        public async Task GetByIdAsync_Should_Return_Correct_Station()
+        public async Task GetByIdAsync_ShouldReturn_CorrectStation()
         {
             var mockRepository = new Mock<IRepository<Station>>();
 
@@ -73,7 +73,7 @@ namespace Api.Tests.Api.Services.Services
         }
 
         [Fact]
-        public async Task CountAsync_Should_Return_Number_Stations()
+        public async Task CountAsync_ShouldReturn_NumberStations()
         {
             var mockRepository = new Mock<IRepository<Station>>();
 

@@ -6,7 +6,7 @@ namespace Api.Tests.Api.Domain.Models
     public class PaginatorTests
     {
         [Fact]
-        public void Paginate_Should_Return_Correct_Page_PageSize()
+        public void Paginate_ShouldReturn_CorrectPagePageSize()
         {
             const int totalDocs = 100;
             var request = new ListResourceRequest

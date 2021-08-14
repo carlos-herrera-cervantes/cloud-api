@@ -1,7 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using Api.Domain.Constants;
 using Api.Services.Services;
@@ -10,6 +7,8 @@ using Api.Repository.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Localization;
+using ServiceStack.Redis;
+using Api.Domain.Models;
 
 namespace Api.Web.Attributes
 {
@@ -21,12 +20,19 @@ namespace Api.Web.Attributes
         {
             private readonly IUserRepository _userRepository;
             private readonly IStringLocalizer<SharedResources> _localizer;
+            private readonly IRedisClientsManagerAsync _redisManager;
 
-            public UserExistsFilter(
+            public UserExistsFilter
+            (
                 IUserRepository userRepository,
-                IStringLocalizer<SharedResources> localizer
+                IStringLocalizer<SharedResources> localizer,
+                IRedisClientsManagerAsync redisManager
             )
-                => (_userRepository, _localizer) = (userRepository, localizer);
+            {
+                _userRepository = userRepository;
+                _localizer = localizer;
+                _redisManager = redisManager;
+            }
 
             public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
             {
@@ -59,6 +65,14 @@ namespace Api.Web.Attributes
                         });
                         return;
                     }
+
+                    await using var redisClient = await _redisManager.GetCacheClientAsync();
+                    await redisClient.SetAsync<User>
+                        (
+                            user.Id,
+                            user,
+                            expiresAt: DateTime.UtcNow.AddMinutes(10)
+                        );
 
                     await next();
                 }

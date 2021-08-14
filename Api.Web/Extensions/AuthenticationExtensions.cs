@@ -21,7 +21,9 @@ namespace Api.Web.Extensions
                 x.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(configuration.GetValue<string>("SecretKey"))),
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII
+                        .GetBytes(configuration
+                        .GetValue<string>("SecretKey"))),
                     ValidateIssuer = false,
                     ValidateAudience = false
                 };

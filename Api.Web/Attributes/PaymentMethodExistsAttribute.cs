@@ -1,9 +1,11 @@
 using System;
 using System.Threading.Tasks;
+using Api.Domain.Models;
 using Api.Services.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Localization;
+using ServiceStack.Redis;
 
 namespace Api.Web.Attributes
 {
@@ -15,13 +17,19 @@ namespace Api.Web.Attributes
         {
             private readonly IPaymentMethodRepository _paymentMethodRepository;
             private readonly IStringLocalizer<SharedResources> _localizer;
+            private readonly IRedisClientsManagerAsync _redisManager;
 
             public PaymentMethodExistsFilter
             (
                 IPaymentMethodRepository paymentMethodRepository,
-                IStringLocalizer<SharedResources> localizer
+                IStringLocalizer<SharedResources> localizer,
+                IRedisClientsManagerAsync redisManager
             )
-                => (_paymentMethodRepository, _localizer) = (paymentMethodRepository, localizer);
+            {
+                _paymentMethodRepository = paymentMethodRepository;
+                _localizer = localizer;
+                _redisManager = redisManager;
+            }
 
             #region snippet_BeforeExecute
 
@@ -42,6 +50,14 @@ namespace Api.Web.Attributes
                         });
                         return;
                     }
+
+                    await using var redisClient = await _redisManager.GetClientAsync();
+                    await redisClient.SetAsync<PaymentMethod>
+                        (
+                            paymentMethod.Id,
+                            paymentMethod,
+                            expiresAt: DateTime.UtcNow.AddMinutes(10)
+                        );
 
                     await next();
                 }
