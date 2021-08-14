@@ -1,14 +1,11 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Api.Domain.Models;
 using Api.Web.Handlers;
 using Api.Web.Models;
 using Firebase.Database;
 using Firebase.Database.Query;
 using Microsoft.Extensions.Hosting;
-using Api.Services.Services;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Api.Web.Backgrounds
 {
@@ -17,52 +14,18 @@ namespace Api.Web.Backgrounds
         private readonly string _path = "events/cloud-api";
         private readonly FirebaseClient _firebaseClient;
         private readonly IOperationHandler _operationHandler;
-        private readonly ICustomerPurchaseManager _customerPurchaseManager;
-        private readonly ICustomerPurchaseRepository _customerPurchaseRepository;
 
-        public FirebaseConsumer
-        (
-            FirebaseClient firebaseClient,
-            IOperationHandler operationHandler,
-            IServiceScopeFactory factory
-        )
+        public FirebaseConsumer(FirebaseClient firebaseClient, IOperationHandler operationHandler)
         {
             _firebaseClient = firebaseClient;
             _operationHandler = operationHandler;
-
-            _customerPurchaseManager = factory
-                .CreateScope()
-                .ServiceProvider
-                .GetRequiredService<ICustomerPurchaseManager>();
-
-            _customerPurchaseRepository = factory
-                .CreateScope()
-                .ServiceProvider
-                .GetRequiredService<ICustomerPurchaseRepository>();
         }
 
         #region ExecuteSubscribe
 
         protected override Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            _firebaseClient
-                .Child("events/local/sales/")
-                .AsObservable<CustomerPurchase>()
-                .Subscribe(async c =>
-                {
-                    if (String.IsNullOrEmpty(c.Key)) return;
-
-                    var sale = await _customerPurchaseRepository.GetByIdAsync(c.Key);
-
-                    if (sale is null)
-                    {
-                        await _customerPurchaseManager.CreateAsync(c.Object);
-                        var @ref = $"events/local/sales/{c.Key}";
-                        await _firebaseClient.Child(@ref).DeleteAsync();
-                    }
-                });
-
-            _operationHandler.Subscribe("FirebaseConsumer", async message => 
+            _operationHandler.Subscribe("FirebaseConsumer", async message =>
             {
                 var operation = SelectQueryByModel(message);
                 await operation;
