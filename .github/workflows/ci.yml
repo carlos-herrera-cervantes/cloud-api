@@ -1,9 +1,7 @@
 name: Cloud-API-CI
 
 on:
-  push:
-    branches:
-      - master
+  [push]
 
 jobs:
   build:
@@ -11,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        dotnet-version: ['3.1.x', '5.0.x']
+        dotnet-version: ['5.0.x']
 
     steps:
       - uses: actions/checkout@v2
@@ -22,6 +20,6 @@ jobs:
       - name: Install dependencies
         run: dotnet restore
       - name: Build
-        run: dotnet build --configuration Release --no-restore
+        run: dotnet build
       - name: Test
-        run: dotnet test --no-restore --verbosity normal
+        run: dotnet test
