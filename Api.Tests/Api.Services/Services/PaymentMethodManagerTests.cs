@@ -28,7 +28,7 @@ namespace Api.Tests.Api.Services.Services
         private readonly Mock<IPaymentMethodRepository> _mockRepository = new Mock<IPaymentMethodRepository>();
 
         [Fact]
-        public async Task CreateAsync_Should_Add_New_PaymentMethod()
+        public async Task CreateAsync_ShouldAdd_NewPaymentMethod()
         {
             var mockManager = new Mock<IManager<PaymentMethod>>();
             var payment = new PaymentMethod
@@ -56,7 +56,7 @@ namespace Api.Tests.Api.Services.Services
         }
 
         [Fact]
-        public async Task UpdateByIdAsync_Should_Update_Existing_PaymentMethod()
+        public async Task UpdateByIdAsync_ShouldUpdate_ExistingPaymentMethod()
         {
             var mockManager = new Mock<IManager<PaymentMethod>>();
             var payment = new PaymentMethod
@@ -74,7 +74,8 @@ namespace Api.Tests.Api.Services.Services
             var updatedProperties = new JsonPatchDocument<PaymentMethod>();
             updatedProperties.Replace(p => p.Status, NEW_STATUS);
 
-            mockManager.Setup(manager => manager.UpdateByIdAsync(It.IsAny<string>(), It.IsAny<PaymentMethod>(), It.IsAny<JsonPatchDocument<PaymentMethod>>()))
+            mockManager.Setup(manager => manager
+                .UpdateByIdAsync(It.IsAny<string>(), It.IsAny<PaymentMethod>(), It.IsAny<JsonPatchDocument<PaymentMethod>>()))
                 .Callback((string id, PaymentMethod payment, JsonPatchDocument<PaymentMethod> updatedProperties) =>
                 {
                     updatedProperties.ApplyTo(payment);
@@ -85,12 +86,19 @@ namespace Api.Tests.Api.Services.Services
 
             await paymentMethodManager.UpdateByIdAsync(OBJECT_ID, payment, updatedProperties);
 
-            mockManager.Verify(x => x.UpdateByIdAsync(It.IsAny<string>(), It.IsAny<PaymentMethod>(), It.IsAny<JsonPatchDocument<PaymentMethod>>()), Times.Once);
+            mockManager.Verify(x =>
+                x.UpdateByIdAsync
+                (
+                    It.IsAny<string>(),
+                    It.IsAny<PaymentMethod>(),
+                    It.IsAny<JsonPatchDocument<PaymentMethod>>()),
+                    Times.Once
+                );
             Assert.Equal(payment.Status, NEW_STATUS);
         }
 
         [Fact]
-        public async Task DeleteByIdAsync_Should_Delete_Correct_PaymentMethod()
+        public async Task DeleteByIdAsync_ShouldDelete_CorrectPaymentMethod()
         {
             var mockManager = new Mock<IManager<PaymentMethod>>();
 

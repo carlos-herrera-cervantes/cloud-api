@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using ServiceStack.Redis;
 
 namespace Api.Web.Controllers
 {
@@ -24,17 +25,20 @@ namespace Api.Web.Controllers
         private readonly IPaymentMethodManager _paymentMethodManager;
         private readonly IPaymentMethodRepository _paymentMethodRepository;
         private readonly IOperationHandler _operationHandler;
+        private readonly IRedisClientsManagerAsync _redisManager;
 
         public PaymentMethodController
         (
-            IPaymentMethodManager paymentMethodManager, 
-            IPaymentMethodRepository paymentMethodRepository, 
-            IOperationHandler operationHandler
+            IPaymentMethodManager paymentMethodManager,
+            IPaymentMethodRepository paymentMethodRepository,
+            IOperationHandler operationHandler,
+            IRedisClientsManagerAsync redisManager
         )
         {
             _paymentMethodManager = paymentMethodManager;
             _paymentMethodRepository = paymentMethodRepository;
             _operationHandler = operationHandler;
+            _redisManager = redisManager;
         }
 
         #region snippet_GetAll
@@ -69,7 +73,11 @@ namespace Api.Web.Controllers
         [PaymentMethodExists]
         public async Task<IActionResult> GetByIdAsync(string id)
         {
-            var paymentMethod = await _paymentMethodRepository.GetByIdAsync(id);
+            await using var redisClient = await _redisManager.GetClientAsync();
+
+            var paymentMethod = await redisClient.GetAsync<PaymentMethod>(id) ??
+                await _paymentMethodRepository.GetByIdAsync(id);
+
             return Ok(new SinglePaymentMethodResponse { Data = paymentMethod });
         }
 
@@ -111,8 +119,13 @@ namespace Api.Web.Controllers
         [PaymentMethodExists]
         public async Task<IActionResult> UpdateByIdAsync(string id, [FromBody] JsonPatchDocument<PaymentMethod> replacePaymentMethod)
         {
-            var paymentMethod = await _paymentMethodRepository.GetByIdAsync(id);
+            await using var redisClient = await _redisManager.GetClientAsync();
+
+            var paymentMethod = await redisClient.GetAsync<PaymentMethod>(id) ??
+                await _paymentMethodRepository.GetByIdAsync(id);
+
             await _paymentMethodManager.UpdateByIdAsync(id, paymentMethod, replacePaymentMethod);
+
             Emitter.EmitMessage(_operationHandler, new CollectionEventReceived
             {
                 Type = EventType.Update,
@@ -120,6 +133,8 @@ namespace Api.Web.Controllers
                 Id = id,
                 Model = paymentMethod
             });
+
+            await redisClient.RemoveAsync(id);
 
             return Ok(new SinglePaymentMethodResponse { Data = paymentMethod });
         }
@@ -137,7 +152,9 @@ namespace Api.Web.Controllers
         [PaymentMethodExists]
         public async Task<IActionResult> DeleteByIdAsync(string id)
         {
+            await using var redisClient = await _redisManager.GetClientAsync();
             await _paymentMethodManager.DeleteByIdAsync(id);
+
             Emitter.EmitMessage(_operationHandler, new CollectionEventReceived
             {
                 Type = EventType.Delete,
@@ -145,6 +162,8 @@ namespace Api.Web.Controllers
                 Id = id,
                 Model = null
             });
+
+            await redisClient.RemoveAsync(id);
 
             return NoContent();
         }

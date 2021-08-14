@@ -93,7 +93,9 @@ namespace Api.Web.Backgrounds
         #region BuildFirebaseQueryForUsersCollection
 
         private Task BuildQueryUsers(CollectionEventReceived message)
-            => _firebaseClient.Child($"{_path}/stations/{message.StationId}/users/tasks/{message.Id}").PutAsync(message);
+            => _firebaseClient
+                .Child($"{_path}/stations/{message.StationId}/users/tasks/{message.Id}")
+                .PutAsync(message);
 
         #endregion
 

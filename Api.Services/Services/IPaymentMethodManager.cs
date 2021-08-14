@@ -8,7 +8,12 @@ namespace Api.Services.Services
     {
         Task CreateAsync(PaymentMethod paymentMethod);
 
-        Task UpdateByIdAsync(string id, PaymentMethod newPaymentMethod, JsonPatchDocument<PaymentMethod> currentPaymentMethod);
+        Task UpdateByIdAsync
+        (
+            string id,
+            PaymentMethod newPaymentMethod,
+            JsonPatchDocument<PaymentMethod> currentPaymentMethod
+        );
 
         Task DeleteByIdAsync(string id);
     }

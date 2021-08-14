@@ -8,6 +8,7 @@ using Api.Web.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using ServiceStack.Redis;
 
 namespace Api.Web.Controllers
 {
@@ -19,9 +20,17 @@ namespace Api.Web.Controllers
     public class CustomerPurchaseController : ControllerBase
     {
         private readonly ICustomerPurchaseRepository _customerPurchaseRepository;
+        private readonly IRedisClientsManagerAsync _redisManager;
 
-        public CustomerPurchaseController(ICustomerPurchaseRepository customerPurchaseRepository)
-            => _customerPurchaseRepository = customerPurchaseRepository;
+        public CustomerPurchaseController
+        (
+            ICustomerPurchaseRepository customerPurchaseRepository,
+            IRedisClientsManagerAsync redisManager
+        )        
+        {
+            _customerPurchaseRepository = customerPurchaseRepository;
+            _redisManager = redisManager;
+        }
 
         #region snippet_Get
 
@@ -35,6 +44,7 @@ namespace Api.Web.Controllers
         {
             var totalDocuments = await _customerPurchaseRepository.CountAsync(request);
             var purchases = await _customerPurchaseRepository.GetAllAsync(request);
+
             return Ok(new ListCustomerPurchaseResponse
             {
                 Data = purchases,
@@ -76,7 +86,10 @@ namespace Api.Web.Controllers
         [CustomerPurchaseExists]
         public async Task<IActionResult> GetByIdAsync(string id, [FromQuery] SingleResourceRequest request)
         {
-            var purchase = await _customerPurchaseRepository.GetByIdAsync(id);
+            await using var redisClient = await _redisManager.GetClientAsync();
+            var purchase = await redisClient.GetAsync<CustomerPurchase>(id) ??
+                await _customerPurchaseRepository.GetByIdAsync(id);
+
             return Ok(new SingleCustomerPurchaseResponse { Data = purchase });
         }
 

@@ -42,8 +42,8 @@ namespace Api.Web.Models
         {
             return localizers
                 .Where(l => l.LocalizedValue.Keys.
-                    Any(lv => lv == CultureInfo.CurrentCulture.Name))
-                    .Select(l => new LocalizedString(l.Key, l.LocalizedValue[CultureInfo.CurrentCulture.Name], true));
+                Any(lv => lv == CultureInfo.CurrentCulture.Name))
+                .Select(l => new LocalizedString(l.Key, l.LocalizedValue[CultureInfo.CurrentCulture.Name], true));
         }
 
         #endregion
@@ -58,8 +58,11 @@ namespace Api.Web.Models
 
         private string GetString(string name)
         {
-            var query = localizers.Where(l => l.LocalizedValue.Keys.Any(lv => lv == CultureInfo.CurrentCulture.Name));
+            var query = localizers
+                .Where(l => l.LocalizedValue.Keys
+                .Any(lv => lv == CultureInfo.CurrentCulture.Name));
             var value = query.FirstOrDefault(l => l.Key == name);
+
             return value.LocalizedValue[CultureInfo.CurrentCulture.Name];
         }
 

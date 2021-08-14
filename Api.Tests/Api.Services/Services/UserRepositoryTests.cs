@@ -34,7 +34,7 @@ namespace Api.Tests.Api.Services.Services
         };
 
         [Fact]
-        public async Task GetAllAsync_Should_Return_Users_List()
+        public async Task GetAllAsync_ShouldReturn_UsersList()
         {
             var mockRepository = new Mock<IRepository<User>>();
 
@@ -56,7 +56,7 @@ namespace Api.Tests.Api.Services.Services
         }
 
         [Fact]
-        public async Task GetByIdAsync_Should_Return_Correct_User()
+        public async Task GetByIdAsync_ShouldReturn_CorrectUser()
         {
             var mockRepository = new Mock<IRepository<User>>();
 
@@ -73,7 +73,7 @@ namespace Api.Tests.Api.Services.Services
         }
 
         [Fact]
-        public async Task CountAsync_Should_Return_Number_Users()
+        public async Task CountAsync_ShouldReturn_NumberUsers()
         {
             var mockRepository = new Mock<IRepository<User>>();
 

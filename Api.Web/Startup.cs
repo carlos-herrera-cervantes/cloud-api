@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Globalization;
+using Api.Infrastructure.Container;
 using Api.Repository.Managers;
 using Api.Repository.Repositories;
 using Api.Services.Services;
@@ -33,6 +34,7 @@ namespace Api.Web
             });
             services.AddTokenAuthentication(Configuration);
             services.UseSwagger();
+            services.AddRedisService(Configuration);
             services.AddScoped(typeof(IManager<>), typeof(Manager<>));
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             services.AddTransient<IStationManager, StationManager>();

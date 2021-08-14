@@ -10,7 +10,6 @@ namespace Api.Domain.Models
         [BsonElement("quantity")]
         [JsonProperty("quantity")]
         [Required(ErrorMessage = "PurchasePaymentQuantityRequired")]
-        [Range(typeof(Decimal), "1", "1000000000000000000", ErrorMessage = "PurchaseInvalidPaymentQuantity")]
         public decimal? Quantity { get; set; }
 
         [BsonElement("key")]

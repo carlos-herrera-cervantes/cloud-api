@@ -24,7 +24,7 @@ namespace Api.Tests.Api.Services.Services
         };
 
         [Fact]
-        public async Task CreateAsync_ShouldAddNew_AccessToken()
+        public async Task CreateAsync_ShouldAdd_NewAccessToken()
         {
             var mockManager = new Mock<IManager<AccessToken>>();
             var token = new AccessToken

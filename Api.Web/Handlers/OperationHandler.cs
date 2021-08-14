@@ -11,7 +11,10 @@ namespace Api.Web.Handlers
         private readonly Dictionary<string, IDisposable> _subscribers;
 
         public OperationHandler()
-            => (_subject, _subscribers) = (new Subject<CollectionEventReceived>(), new Dictionary<string, IDisposable>());
+        {
+            _subject = new Subject<CollectionEventReceived>();
+            _subscribers = new Dictionary<string, IDisposable>();
+        }
 
         #region PublishMessage
 
@@ -23,7 +26,10 @@ namespace Api.Web.Handlers
 
         public void Subscribe(string subscriberName, Action<CollectionEventReceived> action)
         {
-            if (!_subscribers.ContainsKey(subscriberName)) _subscribers.Add(subscriberName, _subject.Subscribe(action));
+            if (!_subscribers.ContainsKey(subscriberName))
+            {
+                _subscribers.Add(subscriberName, _subject.Subscribe(action));
+            }
         }
 
         #endregion

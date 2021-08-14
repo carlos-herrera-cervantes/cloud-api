@@ -15,10 +15,13 @@ namespace Api.Services.Services
         public async Task<IEnumerable<PaymentMethod>> GetAllAsync(ListResourceRequest request)
             => await _paymentMethodRepository.GetAllAsync(request, null);
 
-        public async Task<PaymentMethod> GetByIdAsync(string id) => await _paymentMethodRepository.GetByIdAsync(id);
+        public async Task<PaymentMethod> GetByIdAsync(string id)
+            => await _paymentMethodRepository.GetByIdAsync(id);
 
-        public async Task<PaymentMethod> GetOneAsync(ListResourceRequest request) => await _paymentMethodRepository.GetOneAsync(request);
+        public async Task<PaymentMethod> GetOneAsync(ListResourceRequest request)
+            => await _paymentMethodRepository.GetOneAsync(request);
 
-        public async Task<int> CountAsync(ListResourceRequest request) => await _paymentMethodRepository.CountAsync(request);
+        public async Task<int> CountAsync(ListResourceRequest request)
+            => await _paymentMethodRepository.CountAsync(request);
     }
 }

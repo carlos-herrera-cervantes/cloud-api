@@ -19,10 +19,14 @@ namespace Api.Repository.Managers
             _configuration = configuration;
 
             var client = MongoDBFactory
-                .CreateClient(_configuration.GetSection("MongoDBSettings").GetSection("ConnectionString").Value);
+                .CreateClient(_configuration
+                .GetSection("MongoDBSettings")
+                .GetSection("ConnectionString").Value);
 
             _context = client
-                .GetDatabase(_configuration.GetSection("MongoDBSettings").GetSection("Database").Value)
+                .GetDatabase(_configuration
+                .GetSection("MongoDBSettings")
+                .GetSection("Database").Value)
                 .GetCollection<T>($"{typeof(T).Name}s");
         }
 
@@ -34,7 +38,8 @@ namespace Api.Repository.Managers
             await _context.ReplaceOneAsync(entity => entity.Id == id, newInstance);
         }
 
-        public async Task DeleteByIdAsync(string id) => await _context.DeleteOneAsync(entity => entity.Id == id);
+        public async Task DeleteByIdAsync(string id)
+            => await _context.DeleteOneAsync(entity => entity.Id == id);
 
         public async Task<DeleteResult> DeleteManyAsync(ListResourceRequest request)
         {
@@ -44,6 +49,7 @@ namespace Api.Repository.Managers
             return await _context.DeleteManyAsync(filter);
         }
 
-        public async Task<DeleteResult> DeleteManyAsync(FilterDefinition<T> filter) => await _context.DeleteManyAsync(filter);
+        public async Task<DeleteResult> DeleteManyAsync(FilterDefinition<T> filter)
+            => await _context.DeleteManyAsync(filter);
     }
 }

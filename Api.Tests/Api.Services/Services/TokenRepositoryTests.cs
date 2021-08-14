@@ -33,7 +33,7 @@ namespace Api.Tests.Api.Services.Services
         };
 
         [Fact]
-        public async Task GetOneAsync_Should_Return_Correct_AccessToken()
+        public async Task GetOneAsync_ShouldReturn_CorrectAccessToken()
         {
             var mockRepository = new Mock<IRepository<AccessToken>>();
             const string token = "dummy-token";

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Api.Domain.Models;
 using Api.Services.Services;
@@ -10,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using ServiceStack.Redis;
 using Xunit;
 
 namespace Api.Tests.Api.Web.Controllers
@@ -28,30 +30,41 @@ namespace Api.Tests.Api.Web.Controllers
                 Type = "fuel"
             }
         };
+        private readonly Mock<IProductManager> _mockManager = new Mock<IProductManager>();
+        private readonly Mock<IProductRepository> _mockRepository = new Mock<IProductRepository>();
+        private readonly Mock<IOperationHandler> _mockOperationHandler = new Mock<IOperationHandler>();
+        private readonly Mock<IRedisClientsManagerAsync> _mockRedisManager = new Mock<IRedisClientsManagerAsync>();
+        private readonly Mock<IRedisClientAsync> _mockRedisClient = new Mock<IRedisClientAsync>();
+        private readonly ProductController _productController;
+
+        public ProductControllerTests()
+        {
+            _productController = new ProductController
+            (
+                _mockManager.Object,
+                _mockRepository.Object,
+                _mockOperationHandler.Object,
+                _mockRedisManager.Object
+            );
+        }
 
         [Fact]
         public async Task GetAllAsync_ShouldReturn_ProductsList()
         {
-            var mockManager = new Mock<IProductManager>();
-            var mockRepository = new Mock<IProductRepository>();
-            var mockOperationHandler = new Mock<IOperationHandler>();
+            _mockRepository.Setup(repo => repo
+                .CountAsync(It.IsAny<ListResourceRequest>()))
+                .ReturnsAsync(1);
+            _mockRepository.Setup(repo => repo
+                .GetAllAsync(It.IsAny<ListResourceRequest>()))
+                .ReturnsAsync(_products);
 
-            mockRepository.Setup(repo => repo.CountAsync(It.IsAny<ListResourceRequest>())).ReturnsAsync(1);
-            mockRepository.Setup(repo => repo.GetAllAsync(It.IsAny<ListResourceRequest>())).ReturnsAsync(_products);
-
-            var productController = new ProductController
-            (
-                mockManager.Object,
-                mockRepository.Object,
-                mockOperationHandler.Object
-            );
-
-            var result = await productController.GetAllAsync(new ListResourceRequest { Page = 1, PageSize = 10 });
+            var result = await _productController
+                .GetAllAsync(new ListResourceRequest { Page = 1, PageSize = 10 });
             var response = result as OkObjectResult;
             var responseBody = response.Value as ListProductResponse;
 
-            mockRepository.Verify(x => x.GetAllAsync(It.IsAny<ListResourceRequest>()), Times.Once);
-            mockRepository.Verify(x => x.CountAsync(It.IsAny<ListResourceRequest>()), Times.Once);
+            _mockRepository.Verify(x => x.GetAllAsync(It.IsAny<ListResourceRequest>()), Times.Once);
+            _mockRepository.Verify(x => x.CountAsync(It.IsAny<ListResourceRequest>()), Times.Once);
             Assert.IsType<OkObjectResult>(result);
             Assert.IsType<ListProductResponse>(response.Value);
             Assert.Equal(StatusCodes.Status200OK, response.StatusCode);
@@ -64,25 +77,25 @@ namespace Api.Tests.Api.Web.Controllers
         [Fact]
         public async Task GetByIdAsync_ShouldReturn_SingleProduct()
         {
-            var mockManager = new Mock<IProductManager>();
-            var mockRepository = new Mock<IProductRepository>();
-            var mockOperationHandler = new Mock<IOperationHandler>();
+            _mockRedisManager.Setup(redis => redis
+                .GetClientAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(_mockRedisClient.Object);
 
-            mockRepository.Setup(repo => repo.GetByIdAsync(It.IsAny<string>()))
+            _mockRedisClient.Setup(client => client
+                .GetAsync<Product>(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(() => null);
+
+            _mockRepository.Setup(repo => repo.GetByIdAsync(It.IsAny<string>()))
                 .ReturnsAsync((string id) => _products.SingleOrDefault(p => p.Id == id));
 
-            var productController = new ProductController
-            (
-                mockManager.Object,
-                mockRepository.Object,
-                mockOperationHandler.Object
-            );
-
-            var result = await productController.GetByIdAsync("60f0cbb3117067f1b7416088");
+            var result = await _productController.GetByIdAsync("60f0cbb3117067f1b7416088");
             var response = result as OkObjectResult;
             var responseBody = response.Value as SingleProductResponse;
 
-            mockRepository.Verify(x => x.GetByIdAsync(It.IsAny<string>()), Times.Once);
+            _mockRepository.Verify(x => x.GetByIdAsync(It.IsAny<string>()), Times.Once);
+            _mockRedisManager.Verify(x => x.GetClientAsync(It.IsAny<CancellationToken>()), Times.Once);
+            _mockRedisClient.Verify(x =>
+                x.GetAsync<Product>(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
             Assert.IsType<OkObjectResult>(result);
             Assert.IsType<SingleProductResponse>(response.Value);
             Assert.Equal(StatusCodes.Status200OK, response.StatusCode);
@@ -92,10 +105,6 @@ namespace Api.Tests.Api.Web.Controllers
         [Fact]
         public async Task CreateAsync_ShouldReturn_CreatedProduct()
         {
-            var mockManager = new Mock<IProductManager>();
-            var mockRepository = new Mock<IProductRepository>();
-            var mockOperationHandler = new Mock<IOperationHandler>();
-
             var product = new Product
             {
                 Name = "Product 2",
@@ -105,28 +114,21 @@ namespace Api.Tests.Api.Web.Controllers
                 Type = "fuel"
             };
 
-            mockManager.Setup(manager => manager.CreateAsync(It.IsAny<Product>()))
+            _mockManager.Setup(manager => manager.CreateAsync(It.IsAny<Product>()))
                 .Callback((Product product) => 
                 {
                     product.Id = "60f70c1f7098da34083f12e2";
                     _products.Add(product);
                 });
 
-            mockOperationHandler.Setup(operation => operation.Publish(It.IsAny<CollectionEventReceived>()));
+            _mockOperationHandler.Setup(operation => operation.Publish(It.IsAny<CollectionEventReceived>()));
 
-            var productController = new ProductController
-            (
-                mockManager.Object,
-                mockRepository.Object,
-                mockOperationHandler.Object
-            );
-
-            var result = await productController.CreateAsync(product);
+            var result = await _productController.CreateAsync(product);
             var response = result as CreatedResult;
             var responseBody = response.Value as SingleProductResponse;
 
-            mockManager.Verify(x => x.CreateAsync(It.IsAny<Product>()), Times.Once);
-            mockOperationHandler.Verify(x => x.Publish(It.IsAny<CollectionEventReceived>()), Times.Once);
+            _mockManager.Verify(x => x.CreateAsync(It.IsAny<Product>()), Times.Once);
+            _mockOperationHandler.Verify(x => x.Publish(It.IsAny<CollectionEventReceived>()), Times.Once);
             Assert.IsType<CreatedResult>(result);
             Assert.IsType<SingleProductResponse>(response.Value);
             Assert.Equal(StatusCodes.Status201Created, response.StatusCode);
@@ -136,10 +138,6 @@ namespace Api.Tests.Api.Web.Controllers
         [Fact]
         public async Task UpdateByIdAsync_ShouldReturn_UpdatedProduct()
         {
-            var mockManager = new Mock<IProductManager>();
-            var mockRepository = new Mock<IProductRepository>();
-            var mockOperationHandler = new Mock<IOperationHandler>();
-
             var product = new Product
             {
                 Id = "60f0cbb3117067f1b7416088",
@@ -155,32 +153,55 @@ namespace Api.Tests.Api.Web.Controllers
             var updatedProperties = new JsonPatchDocument<Product>();
             updatedProperties.Replace(p => p.Price, NEW_PRICE);
 
-            mockRepository.Setup(repo => repo.GetByIdAsync(It.IsAny<string>()))
+            _mockRedisManager.Setup(redis => redis
+                .GetClientAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(_mockRedisClient.Object);
+
+            _mockRedisClient.Setup(client => client
+                .GetAsync<Product>(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(() => null);
+
+            _mockRedisClient.Setup(client => client
+                .RemoveAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(true);
+
+            _mockRepository.Setup(repo => repo.GetByIdAsync(It.IsAny<string>()))
                 .ReturnsAsync((string id) => _products.SingleOrDefault(p => p.Id == id));
 
-            mockManager.Setup(manager => manager.UpdateByIdAsync(It.IsAny<string>(), It.IsAny<Product>(), It.IsAny<JsonPatchDocument<Product>>()))
+            _mockManager.Setup(manager => manager
+                .UpdateByIdAsync
+                (
+                    It.IsAny<string>(),
+                    It.IsAny<Product>(),
+                    It.IsAny<JsonPatchDocument<Product>>())
+                )
                 .Callback((string id, Product product, JsonPatchDocument<Product> updatedProperties) =>
                 {
                     updatedProperties.ApplyTo(product);
                     _products[_products.FindIndex(p => p.Id == id)] = product;
                 });
 
-            mockOperationHandler.Setup(operation => operation.Publish(It.IsAny<CollectionEventReceived>()));
+            _mockOperationHandler.Setup(operation => operation.Publish(It.IsAny<CollectionEventReceived>()));
 
-            var productController = new ProductController
-            (
-                mockManager.Object,
-                mockRepository.Object,
-                mockOperationHandler.Object
-            );
-
-            var result = await productController.UpdateByIdAsync("60f0cbb3117067f1b7416088", updatedProperties);
+            var result = await _productController.UpdateByIdAsync("60f0cbb3117067f1b7416088", updatedProperties);
             var response = result as OkObjectResult;
             var responseBody = response.Value as SingleProductResponse;
 
-            mockRepository.Verify(x => x.GetByIdAsync(It.IsAny<string>()), Times.Once);
-            mockManager.Verify(x => x.UpdateByIdAsync(It.IsAny<string>(), It.IsAny<Product>(), It.IsAny<JsonPatchDocument<Product>>()), Times.Once);
-            mockOperationHandler.Verify(x => x.Publish(It.IsAny<CollectionEventReceived>()), Times.Once);
+            _mockRepository.Verify(x => x.GetByIdAsync(It.IsAny<string>()), Times.Once);
+            _mockManager.Verify(x => x
+                .UpdateByIdAsync
+                (
+                    It.IsAny<string>(),
+                    It.IsAny<Product>(),
+                    It.IsAny<JsonPatchDocument<Product>>()),
+                    Times.Once
+                );
+            _mockOperationHandler.Verify(x => x.Publish(It.IsAny<CollectionEventReceived>()), Times.Once);
+            _mockRedisManager.Verify(x => x.GetClientAsync(It.IsAny<CancellationToken>()), Times.Once);
+            _mockRedisClient.Verify(x =>
+                x.GetAsync<Product>(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
+            _mockRedisClient.Verify(x =>
+                x.RemoveAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
             Assert.IsType<OkObjectResult>(result);
             Assert.IsType<SingleProductResponse>(response.Value);
             Assert.Equal(StatusCodes.Status200OK, response.StatusCode);
@@ -190,27 +211,27 @@ namespace Api.Tests.Api.Web.Controllers
         [Fact]
         public async Task DeleteByIdAsync_ShouldDelete_SpecificProduct()
         {
-            var mockManager = new Mock<IProductManager>();
-            var mockRepository = new Mock<IProductRepository>();
-            var mockOperationHandler = new Mock<IOperationHandler>();
+            _mockRedisManager.Setup(redis => redis
+                .GetClientAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(_mockRedisClient.Object);
 
-            mockManager.Setup(manager => manager.DeleteByIdAsync(It.IsAny<string>()))
+            _mockRedisClient.Setup(client => client
+                .RemoveAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(true);
+
+            _mockManager.Setup(manager => manager.DeleteByIdAsync(It.IsAny<string>()))
                 .Callback((string id) => _products.RemoveAt(_products.FindIndex(p => p.Id == id)));
 
-            mockOperationHandler.Setup(operation => operation.Publish(It.IsAny<CollectionEventReceived>()));
+            _mockOperationHandler.Setup(operation => operation.Publish(It.IsAny<CollectionEventReceived>()));
 
-            var productController = new ProductController
-            (
-                mockManager.Object,
-                mockRepository.Object,
-                mockOperationHandler.Object
-            );
-
-            var result = await productController.DeleteByIdAsync("60f0cbb3117067f1b7416088");
+            var result = await _productController.DeleteByIdAsync("60f0cbb3117067f1b7416088");
             var response = result as NoContentResult;
 
-            mockManager.Verify(x => x.DeleteByIdAsync(It.IsAny<string>()), Times.Once);
-            mockOperationHandler.Verify(x => x.Publish(It.IsAny<CollectionEventReceived>()), Times.Once);
+            _mockManager.Verify(x => x.DeleteByIdAsync(It.IsAny<string>()), Times.Once);
+            _mockOperationHandler.Verify(x => x.Publish(It.IsAny<CollectionEventReceived>()), Times.Once);
+            _mockRedisManager.Verify(x => x.GetClientAsync(It.IsAny<CancellationToken>()), Times.Once);
+            _mockRedisClient.Verify(x =>
+                x.RemoveAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
             Assert.IsType<NoContentResult>(result);
             Assert.Equal(StatusCodes.Status204NoContent, response.StatusCode);
         }

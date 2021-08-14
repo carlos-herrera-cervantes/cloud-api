@@ -51,7 +51,11 @@ namespace Api.Tests.Api.Web.Controllers
                 mockLocalizer.Object
             );
 
-            var result = await loginController.Login(new Credentials { Email = "user@example.com", Password = "secret123" });
+            var result = await loginController.Login(new Credentials
+            { 
+                Email = "user@example.com",
+                Password = "secret123"
+            });
             var response = result as OkObjectResult;
             var responseBody = response.Value as StringResponse;
 
@@ -80,7 +84,11 @@ namespace Api.Tests.Api.Web.Controllers
                 mockLocalizer.Object
             );
 
-            var result = await loginController.Login(new Credentials { Email = "user@example.com", Password = "secret" });
+            var result = await loginController.Login(new Credentials
+            {
+                Email = "user@example.com",
+                Password = "secret"
+            });
             
             mockRepository.Verify(x => x.GetOneAsync(It.IsAny<FilterDefinition<User>>()), Times.Once);
             Assert.IsType<BadRequestResult>(result);

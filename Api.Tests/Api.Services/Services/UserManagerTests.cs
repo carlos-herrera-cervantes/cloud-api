@@ -25,7 +25,7 @@ namespace Api.Tests.Api.Services.Services
         };
 
         [Fact]
-        public async Task CreateAsync_Should_Add_New_User()
+        public async Task CreateAsync_ShouldAdd_NewUser()
         {
             var mockManager = new Mock<IManager<User>>();
             var user = new User
@@ -54,7 +54,7 @@ namespace Api.Tests.Api.Services.Services
         }
 
         [Fact]
-        public async Task UpdateByIdAsync_Should_Update_Existing_User()
+        public async Task UpdateByIdAsync_ShouldUpdate_ExistingUser()
         {
             var mockManager = new Mock<IManager<User>>();
             var user = new User
@@ -73,7 +73,8 @@ namespace Api.Tests.Api.Services.Services
             var updatedProperties = new JsonPatchDocument<User>();
             updatedProperties.Replace(u => u.LastName, NEW_LAST_NAME);
 
-            mockManager.Setup(manager => manager.UpdateByIdAsync(It.IsAny<string>(), It.IsAny<User>(), It.IsAny<JsonPatchDocument<User>>()))
+            mockManager.Setup(manager => manager
+                .UpdateByIdAsync(It.IsAny<string>(), It.IsAny<User>(), It.IsAny<JsonPatchDocument<User>>()))
                 .Callback((string id, User user, JsonPatchDocument<User> updatedProperties) =>
                 {
                     updatedProperties.ApplyTo(user);
@@ -84,12 +85,13 @@ namespace Api.Tests.Api.Services.Services
 
             await userManager.UpdateByIdAsync(OBJECT_ID, user, updatedProperties);
 
-            mockManager.Verify(x => x.UpdateByIdAsync(It.IsAny<string>(), It.IsAny<User>(), It.IsAny<JsonPatchDocument<User>>()), Times.Once) ;
+            mockManager.Verify(x =>
+                x.UpdateByIdAsync(It.IsAny<string>(), It.IsAny<User>(), It.IsAny<JsonPatchDocument<User>>()), Times.Once);
             Assert.Equal(user.LastName, NEW_LAST_NAME);
         }
 
         [Fact]
-        public async Task DeleteByIdAsync_Should_Delete_Correct_User()
+        public async Task DeleteByIdAsync_ShouldDelete_CorrectUser()
         {
             var mockManager = new Mock<IManager<User>>();
 

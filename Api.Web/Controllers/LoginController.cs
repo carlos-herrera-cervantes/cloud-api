@@ -53,7 +53,8 @@ namespace Api.Web.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Login([FromBody] Credentials credentials)
         {
-            var user = await _userRepository.GetOneAsync(Builders<User>.Filter.Where(u => u.Email == credentials.Email));
+            var user = await _userRepository
+                .GetOneAsync(Builders<User>.Filter.Where(u => u.Email == credentials.Email));
 
             if (user is null || credentials.Password != user.Password) return BadRequest();
 

@@ -1,15 +1,17 @@
 using System;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Api.Domain.Constants;
 using Api.Services.Services;
 using Api.Web.Extensions;
+using Api.Repository.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Localization;
+using ServiceStack.Redis;
+using Api.Domain.Models;
 
 namespace Api.Web.Attributes
 {
@@ -21,13 +23,19 @@ namespace Api.Web.Attributes
         {
             private readonly IStationRepository _stationRepository;
             private readonly IStringLocalizer<SharedResources> _localizer;
+            private readonly IRedisClientsManagerAsync _redisManager;
 
             public StationExistsFilter
             (
                 IStationRepository stationRepository,
-                IStringLocalizer<SharedResources> localizer
+                IStringLocalizer<SharedResources> localizer,
+                IRedisClientsManagerAsync redisManager
             )
-                => (_stationRepository, _localizer) = (stationRepository, localizer);
+            {
+                _stationRepository = stationRepository;
+                _localizer = localizer;
+                _redisManager = redisManager;
+            }
             
             #region snippet_BeforeExecute
 
@@ -37,19 +45,9 @@ namespace Api.Web.Attributes
                 {
                     var id = context.ActionArguments["id"] as string;
                     var token = context.HttpContext.Request.Headers.ExtractJsonWebToken();
-                    
-                    var handler = new JwtSecurityTokenHandler();
-                    var decoded = handler.ReadJwtToken(token);
 
-                    string role = ((List<Claim>)decoded.Claims)?
-                        .Where(claim => claim.Type == "role")
-                        .Select(claim => claim.Value)
-                        .SingleOrDefault();
-                    
-                    string stationId = ((List<Claim>)decoded.Claims)?
-                        .Where(claim => claim.Type == "station")
-                        .Select(claim => claim.Value)
-                        .SingleOrDefault();
+                    string role = token.SelectClaim("role");
+                    string stationId = token.SelectClaim("station");
 
                     if (role != Roles.SuperAdmin && id != stationId)
                     {
@@ -73,6 +71,14 @@ namespace Api.Web.Attributes
                         });
                         return;
                     }
+
+                    await using var redisClient = await _redisManager.GetClientAsync();
+                    await redisClient.SetAsync<Station>
+                        (
+                            station.Id,
+                            station,
+                            expiresAt: DateTime.UtcNow.AddMinutes(10)
+                        );
 
                     await next();
                 }

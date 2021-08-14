@@ -25,7 +25,7 @@ namespace Api.Tests.Api.Services.Services
         };
 
         [Fact]
-        public async Task CreateAsync_Should_Add_New_Product()
+        public async Task CreateAsync_ShouldAdd_NewProduct()
         {
             var mockManager = new Mock<IManager<Product>>();
             var product = new Product
@@ -54,7 +54,7 @@ namespace Api.Tests.Api.Services.Services
         }
 
         [Fact]
-        public async Task UpdateByIdAsync_Should_Update_Existing_Product()
+        public async Task UpdateByIdAsync_ShouldUpdate_ExistingProduct()
         {
             var mockManager = new Mock<IManager<Product>>();
             var product = new Product
@@ -73,7 +73,8 @@ namespace Api.Tests.Api.Services.Services
             var updatedProperties = new JsonPatchDocument<Product>();
             updatedProperties.Replace(p => p.Name, NEW_NAME);
 
-            mockManager.Setup(manager => manager.UpdateByIdAsync(It.IsAny<string>(), It.IsAny<Product>(), It.IsAny<JsonPatchDocument<Product>>()))
+            mockManager.Setup(manager => manager
+                .UpdateByIdAsync(It.IsAny<string>(), It.IsAny<Product>(), It.IsAny<JsonPatchDocument<Product>>()))
                 .Callback((string id, Product product, JsonPatchDocument<Product> updatedProperties) =>
                 {
                     updatedProperties.ApplyTo(product);
@@ -84,12 +85,13 @@ namespace Api.Tests.Api.Services.Services
 
             await productManager.UpdateByIdAsync(OBJECT_ID, product, updatedProperties);
 
-            mockManager.Verify(x => x.UpdateByIdAsync(It.IsAny<string>(), It.IsAny<Product>(), It.IsAny<JsonPatchDocument<Product>>()), Times.Once);
+            mockManager.Verify(x =>
+                x.UpdateByIdAsync(It.IsAny<string>(), It.IsAny<Product>(), It.IsAny<JsonPatchDocument<Product>>()), Times.Once);
             Assert.Equal(product.Name, NEW_NAME);
         }
 
         [Fact]
-        public async Task DeleteByIdAsync_Should_Delete_Correct_Product()
+        public async Task DeleteByIdAsync_ShouldDelete_CorrectProduct()
         {
             var mockManager = new Mock<IManager<Product>>();
 

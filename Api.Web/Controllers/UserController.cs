@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using ServiceStack.Redis;
 
 namespace Api.Web.Controllers
 {
@@ -26,17 +27,20 @@ namespace Api.Web.Controllers
         private readonly IUserManager _userManager;
         private readonly IUserRepository _userRepository;
         private readonly IOperationHandler _operationHandler;
+        private readonly IRedisClientsManagerAsync _redisManager;
 
         public UserController
         (
             IUserManager userManager,
             IUserRepository userRepository,
-            IOperationHandler operationHandler
+            IOperationHandler operationHandler,
+            IRedisClientsManagerAsync redisManager
         )
         {
             _userManager = userManager;
             _userRepository = userRepository;
             _operationHandler = operationHandler;
+            _redisManager = redisManager;
         }
 
         #region snippet_Get
@@ -108,7 +112,11 @@ namespace Api.Web.Controllers
         [UserExists]
         public async Task<IActionResult> GetByIdAsync(string id)
         {
-            var user = await _userRepository.GetByIdAsync(id);
+            await using var redisClient = await _redisManager.GetClientAsync();
+
+            var user = await redisClient.GetAsync<User>(id) ??
+                await _userRepository.GetByIdAsync(id);
+
             return Ok(new SingleUserResponse { Data = user });
         }
 
@@ -150,8 +158,13 @@ namespace Api.Web.Controllers
         [UserExists]
         public async Task<IActionResult> UpdateByIdAsync(string id, [FromBody] JsonPatchDocument<User> replaceUser)
         {
-            var user = await _userRepository.GetByIdAsync(id);
+            await using var redisClient = await _redisManager.GetClientAsync();
+
+            var user = await redisClient.GetAsync<User>(id) ??
+                await _userRepository.GetByIdAsync(id);
+
             await _userManager.UpdateByIdAsync(id, user, replaceUser);
+
             Emitter.EmitMessage(_operationHandler, new CollectionEventReceived
             {
                 Type = EventType.Update,
@@ -160,6 +173,8 @@ namespace Api.Web.Controllers
                 StationId = user.StationId,
                 Model = user
             });
+
+            await redisClient.RemoveAsync(id);
             
             return Ok(new SingleUserResponse { Data = user });
         }
@@ -177,8 +192,13 @@ namespace Api.Web.Controllers
         [UserExists]
         public async Task<IActionResult> DeleteByIdAsync(string id)
         {
-            var user = await _userRepository.GetByIdAsync(id);
+            await using var redisClient = await _redisManager.GetClientAsync();
+
+            var user = await redisClient.GetAsync<User>(id) ??
+                await _userRepository.GetByIdAsync(id);
+
             await _userManager.DeleteByIdAsync(id);
+
             Emitter.EmitMessage(_operationHandler, new CollectionEventReceived
             {
                 Type = EventType.Delete,
@@ -187,6 +207,8 @@ namespace Api.Web.Controllers
                 StationId = user.StationId,
                 Model = null
             });
+
+            await redisClient.RemoveAsync(id);
 
             return NoContent();
         }

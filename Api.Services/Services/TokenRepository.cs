@@ -9,8 +9,10 @@ namespace Api.Services.Services
     {
         private readonly IRepository<AccessToken> _tokenRepository;
 
-        public TokenRepository(IRepository<AccessToken> tokenRepository) => _tokenRepository = tokenRepository;
+        public TokenRepository(IRepository<AccessToken> tokenRepository)
+            => _tokenRepository = tokenRepository;
 
-        public async Task<AccessToken> GetOneAsync(FilterDefinition<AccessToken> filter) => await _tokenRepository.GetOneAsync(filter);
+        public async Task<AccessToken> GetOneAsync(FilterDefinition<AccessToken> filter)
+            => await _tokenRepository.GetOneAsync(filter);
     }
 }
